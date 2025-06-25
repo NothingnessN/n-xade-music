@@ -1,0 +1,13 @@
+AKN Music is a simple, elegant and open source music player for Android.
+
+Features:
+- Clean and modern user interface
+- Background playback with notification controls
+- Playlist management
+- Repeat one/all functionality
+- Theme customization
+- No ads, no tracking, completely free and open source
+
+This application respects your privacy and doesn't require any unnecessary permissions.
+
+I am NothingnessN, a 21-year-old software developer who graduated from the Computer Programming department. If you like my project, you can [support me here](https://buymeacoffee.com/nothingnessn). Thank you for downloading and using my project! 

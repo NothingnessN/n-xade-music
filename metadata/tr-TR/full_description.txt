@@ -1,0 +1,13 @@
+AKN Music, Android için basit, şık ve açık kaynaklı bir müzik çalar uygulamasıdır.
+
+Özellikler:
+- Temiz ve modern kullanıcı arayüzü
+- Bildirim kontrolleriyle arka planda çalma
+- Çalma listesi yönetimi
+- Tek şarkı/tümünü tekrarlama özelliği
+- Tema özelleştirme
+- Reklamsız, takip içermeyen, tamamen ücretsiz ve açık kaynak
+
+Bu uygulama gizliliğinize saygı duyar ve gereksiz hiçbir izin talep etmez.
+
+Ben NothingnessN, 21 yaşında bilgisayar programcılığı bölümünden mezun olmuş bir yazılımcıyım. Projemi beğendiyseniz [bu linkten](https://buymeacoffee.com/nothingnessn) bağış atabilirsiniz. Projemi indirip kullandığınız için teşekkürler! 

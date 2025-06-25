@@ -1,0 +1,19 @@
+{
+  "hello": "Hello",
+  "playlist": "Playlist",
+  "add_song": "Add Song",
+  "player": "Player",
+  "audio_list": "Audio List",
+  "by_nothingnessn": "By NothingnessN",
+  "all_audios": "All Audios",
+  "add_playlist": "Add Playlist",
+  "new_playlist": "New Playlist",
+  "playlist_title": "Playlist",
+  "options": "Options",
+  "add_to_playlist": "Add to Playlist",
+  "remove_from_playlist": "Remove from Playlist",
+  "delete_playlist": "Delete Playlist",
+  "no_playlists": "No playlists yet",
+  "click_to_create": "Click the + button to create a new playlist",
+  "songs": "songs"
+} 

@@ -1,0 +1,19 @@
+{
+  "hello": "Merhaba",
+  "playlist": "Çalma Listesi",
+  "add_song": "Şarkı Ekle",
+  "player": "Çalar",
+  "audio_list": "Müzik Listesi",
+  "by_nothingnessn": "NothingnessN tarafından",
+  "all_audios": "Tüm Şarkılar",
+  "add_playlist": "Çalma Listesi Ekle",
+  "new_playlist": "Yeni Çalma Listesi",
+  "playlist_title": "Çalma Listesi",
+  "options": "Seçenekler",
+  "add_to_playlist": "Çalma Listesine Ekle",
+  "remove_from_playlist": "Çalma Listesinden Kaldır",
+  "delete_playlist": "Çalma Listesini Sil",
+  "no_playlists": "Henüz playlist yok",
+  "click_to_create": "Yeni playlist oluşturmak için + butonuna tıklayın",
+  "songs": "şarkı"
+} 

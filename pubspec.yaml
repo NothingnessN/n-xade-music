@@ -48,6 +48,9 @@ flutter:
     - assets/5.png
     - assets/6.png
     - assets/7.png
+    - assets/8.png
+    - assets/notification_logo.png
+    - assets/licenses/
 
 flutter_launcher_icons:
   android: "launcher_icon"

@@ -18,22 +18,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get add_song => 'Şarkı Ekle';
 
   @override
-  String get player => 'Çalar';
+  String get player => 'Oynatıcı';
 
   @override
-  String get audio_list => 'Müzik Listesi';
+  String get audio_list => 'Ses Listesi';
 
   @override
   String get by_nothingnessn => 'NothingnessN tarafından';
 
   @override
-  String get all_audios => 'Tüm Şarkılar';
+  String get all_audios => 'Tüm Sesler';
 
   @override
   String get add_playlist => 'Çalma Listesi Ekle';
 
   @override
   String get new_playlist => 'Yeni Çalma Listesi';
+
+  @override
+  String get create_playlist => 'Çalma Listesi Oluştur';
 
   @override
   String get playlist_title => 'Çalma Listesi';
@@ -51,12 +54,47 @@ class AppLocalizationsTr extends AppLocalizations {
   String get delete_playlist => 'Çalma Listesini Sil';
 
   @override
-  String get no_playlists => 'Henüz playlist yok';
+  String get no_playlists => 'Henüz çalma listesi yok';
 
   @override
   String get click_to_create =>
-      'Yeni playlist oluşturmak için + butonuna tıklayın';
+      'Yeni bir çalma listesi oluşturmak için + düğmesine tıklayın';
 
   @override
   String get songs => 'şarkı';
+
+  @override
+  String get choose_theme => 'Tema Seç';
+
+  @override
+  String get delete_playlist_title => 'Çalma Listesini Sil';
+
+  @override
+  String delete_playlist_message(Object playlistName) {
+    return '$playlistName çalma listesini silmek istediğinizden emin misiniz?';
+  }
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String removed_from_playlist(Object songName) {
+    return '$songName çalma listesinden kaldırıldı';
+  }
+
+  @override
+  String added_to_playlist(Object songName, Object playlistName) {
+    return '$songName şarkısı $playlistName çalma listesine eklendi';
+  }
+
+  @override
+  String playlist_deleted(Object playlistName) {
+    return '$playlistName çalma listesi silindi';
+  }
+
+  @override
+  String get language_turkish => 'Türkçe';
+
+  @override
+  String get language_english => 'İngilizce';
 }

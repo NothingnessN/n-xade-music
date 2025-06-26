@@ -23,12 +23,15 @@ class AudioFile {
     this.size,
   });
 
-  String get displayNameWOExt {
-    final lastDot = filename.lastIndexOf('.');
-    if (lastDot != -1) {
-      return filename.substring(0, lastDot);
-    }
-    return filename;
+  factory AudioFile.fromJson(Map<String, dynamic> json) {
+    return AudioFile(
+      id: json['id'],
+      filename: json['filename'],
+      uri: json['uri'],
+      duration: json['duration'].toDouble(),
+      artist: json['artist'],
+      album: json['album'],
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -39,8 +42,24 @@ class AudioFile {
       'duration': duration,
       'artist': artist,
       'album': album,
-      'size': size,
     };
+  }
+
+  String get displayName {
+    // Sayısal değer kontrolü
+    if (RegExp(r'^\d+$').hasMatch(filename)) {
+      return 'Unknown Song';
+    }
+    return filename;
+  }
+
+  String get displayNameWOExt {
+    String name = displayName;
+    final lastDot = name.lastIndexOf('.');
+    if (lastDot != -1) {
+      return name.substring(0, lastDot);
+    }
+    return name;
   }
 }
 
@@ -48,12 +67,12 @@ class AudioProvider with ChangeNotifier {
   final OnAudioQuery _audioQuery = OnAudioQuery();
 
   List<AudioFile> _audioFiles = [];
+  List<Map<String, dynamic>> _playlists = [];
   AudioFile? _currentAudio;
   bool _isPlaying = false;
-  int? _currentAudioIndex;
+  int _currentAudioIndex = -1;
   double? _playbackPosition;
   double? _playbackDuration;
-  List<Map<String, dynamic>> _playList = [];
   AudioFile? _addToPlayList;
   Map<String, dynamic>? _activePlayList;
   bool _isPlayListRunning = false;
@@ -70,12 +89,12 @@ class AudioProvider with ChangeNotifier {
 
   // Getters
   List<AudioFile> get audioFiles => _audioFiles;
+  List<Map<String, dynamic>> get playlists => _playlists;
   AudioFile? get currentAudio => _currentAudio;
   bool get isPlaying => _isPlaying;
-  int? get currentAudioIndex => _currentAudioIndex;
+  int get currentAudioIndex => _currentAudioIndex;
   double? get playbackPosition => _playbackPosition;
   double? get playbackDuration => _playbackDuration;
-  List<Map<String, dynamic>> get playList => _playList;
   AudioFile? get addToPlayList => _addToPlayList;
   Map<String, dynamic>? get activePlayList => _activePlayList;
   bool get isPlayListRunning => _isPlayListRunning;
@@ -125,13 +144,26 @@ class AudioProvider with ChangeNotifier {
       _audioFiles = [];
       for (var song in songs) {
         if (song.isMusic == true && song.fileExtension != null) {
+          // Şarkı adını düzgün bir şekilde al
+          String songTitle = song.title ?? '';
+          // Eğer title boşsa veya sayısal bir değerse displayName'i kullan
+          if (songTitle.isEmpty || RegExp(r'^\d+$').hasMatch(songTitle)) {
+            songTitle = song.displayName ?? songTitle;
+          }
+          // Hala boşsa veya sayısal değerse displayNameWOExt'i kullan
+          if (songTitle.isEmpty || RegExp(r'^\d+$').hasMatch(songTitle)) {
+            songTitle = song.displayNameWOExt ?? songTitle;
+          }
+          // Uzantıyı kaldır
+          songTitle = songTitle.replaceAll(RegExp(r'\.[^.]*$'), '');
+          
           final audioFile = AudioFile(
             id: song.id.toString(),
-            filename: song.displayName ?? song.title ?? 'Unknown',
+            filename: songTitle,
             uri: song.uri ?? '',
             duration: (song.duration ?? 0) / 1000.0,
-            artist: song.artist,
-            album: song.album,
+            artist: song.artist ?? 'Unknown Artist',
+            album: song.album ?? 'Unknown Album',
             size: song.size,
           );
           _audioFiles.add(audioFile);
@@ -164,9 +196,51 @@ class AudioProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateState({
+    bool? isPlaying,
+    int? currentAudioIndex,
+    double? playbackPosition,
+    double? playbackDuration,
+  }) {
+    if (isPlaying != null) _isPlaying = isPlaying;
+    if (currentAudioIndex != null) {
+      _currentAudioIndex = currentAudioIndex;
+      if (currentAudioIndex >= 0 && currentAudioIndex < _audioFiles.length) {
+        _currentAudio = _audioFiles[currentAudioIndex];
+      }
+    }
+    if (playbackPosition != null) {
+      _playbackPosition = playbackPosition;
+    }
+    if (playbackDuration != null) {
+      _playbackDuration = playbackDuration;
+    }
+    notifyListeners();
+  }
+
+  void resetPlaybackState() {
+    _isPlaying = false;
+    _currentAudioIndex = -1;
+    _currentAudio = null;
+    _playbackPosition = 0;
+    _playbackDuration = 0;
+    notifyListeners();
+  }
+
+  void removeAudio(String audioId) {
+    _audioFiles.removeWhere((audio) => audio.id == audioId);
+    if (_currentAudio?.id == audioId) {
+      resetPlaybackState();
+    }
+    for (var playlist in _playlists) {
+      removeAudioFromPlaylist(playlist['id'], audioId);
+    }
+    notifyListeners();
+  }
+
   void createPlayList(String title) {
     print('🎵 Creating playlist: "$title"');
-    print('📊 Current playlist count: ${_playList.length}');
+    print('📊 Current playlist count: ${_playlists.length}');
     
     if (title.trim().isEmpty) {
       print('❌ Playlist title is empty');
@@ -180,30 +254,29 @@ class AudioProvider with ChangeNotifier {
       'createdAt': DateTime.now().toIso8601String(),
     };
     
-    _playList.add(newPlaylist);
+    _playlists.add(newPlaylist);
     print('✅ Playlist added to memory: ${newPlaylist['title']}');
     
     _savePlaylists();
     notifyListeners();
     
     print('🎉 Playlist created successfully: "$title"');
-    print('📊 New playlist count: ${_playList.length}');
+    print('📊 New playlist count: ${_playlists.length}');
   }
 
   void deletePlaylist(String playlistId) {
-    _playList.removeWhere((playlist) => playlist['id'] == playlistId);
+    _playlists.removeWhere((playlist) => playlist['id'] == playlistId);
     _savePlaylists();
     notifyListeners();
     print('🗑️ Playlist deleted: $playlistId');
   }
 
   void addAudioToPlaylist(String playlistId, AudioFile audio) {
-    final playlistIndex = _playList.indexWhere((playlist) => playlist['id'] == playlistId);
+    final playlistIndex = _playlists.indexWhere((playlist) => playlist['id'] == playlistId);
     if (playlistIndex != -1) {
-      // Şarkının zaten playlist'te olup olmadığını kontrol et
-      final audioExists = _playList[playlistIndex]['audios'].any((item) => item['id'] == audio.id);
+      final audioExists = _playlists[playlistIndex]['audios'].any((item) => item['id'] == audio.id);
       if (!audioExists) {
-        _playList[playlistIndex]['audios'].add({
+        _playlists[playlistIndex]['audios'].add({
           'id': audio.id,
           'filename': audio.filename,
           'uri': audio.uri,
@@ -216,26 +289,27 @@ class AudioProvider with ChangeNotifier {
       } else {
         print('⚠️ Audio already exists in playlist: ${audio.filename}');
       }
+    } else {
+      print('❌ Playlist not found: $playlistId');
     }
   }
 
   void removeAudioFromPlaylist(String playlistId, String audioId) {
-    final playlistIndex = _playList.indexWhere((playlist) => playlist['id'] == playlistId);
+    final playlistIndex = _playlists.indexWhere((playlist) => playlist['id'] == playlistId);
     if (playlistIndex != -1) {
-      _playList[playlistIndex]['audios'].removeWhere((audio) => audio['id'] == audioId);
+      _playlists[playlistIndex]['audios'].removeWhere((audio) => audio['id'] == audioId);
       _savePlaylists();
       notifyListeners();
-      print('❌ Audio removed from playlist: $audioId');
+      print('🗑️ Audio removed from playlist: $audioId');
     }
   }
 
   Future<void> _savePlaylists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final playlistsJson = jsonEncode(_playList);
+      final playlistsJson = jsonEncode(_playlists);
       await prefs.setString('playlists', playlistsJson);
-      print('💾 Playlists saved to storage: ${_playList.length} playlists');
-      print('📄 JSON data: $playlistsJson');
+      print('💾 Playlists saved to storage: ${_playlists.length} playlists');
     } catch (e) {
       print('❌ Error saving playlists: $e');
     }
@@ -244,18 +318,15 @@ class AudioProvider with ChangeNotifier {
   Future<void> _loadPlaylists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final playlistsJson = prefs.getString('playlists');
-      print('📂 Loading playlists from storage...');
-      
-      if (playlistsJson != null) {
-        print('📄 Found playlists JSON: $playlistsJson');
-        final List<dynamic> playlistsData = jsonDecode(playlistsJson);
-        _playList = playlistsData.cast<Map<String, dynamic>>();
-        print('📂 Loaded ${_playList.length} playlists from storage');
+      final playlistsString = prefs.getString('playlists');
+      if (playlistsString != null) {
+        final playlistsData = jsonDecode(playlistsString) as List<dynamic>;
+        _playlists = playlistsData.cast<Map<String, dynamic>>();
+        print('📂 Loaded ${_playlists.length} playlists from storage');
         
-        // Her playlist'i listele
-        for (int i = 0; i < _playList.length; i++) {
-          print('   ${i + 1}. ${_playList[i]['title']} (${_playList[i]['audios'].length} songs)');
+        // Debug: Print loaded playlists
+        for (int i = 0; i < _playlists.length; i++) {
+          print('   ${i + 1}. ${_playlists[i]['title']} (${_playlists[i]['audios'].length} songs)');
         }
       } else {
         print('📂 No playlists found in storage');
@@ -263,39 +334,6 @@ class AudioProvider with ChangeNotifier {
     } catch (e) {
       print('❌ Error loading playlists: $e');
     }
-  }
-
-  void updateState({
-    bool? isPlaying,
-    int? currentAudioIndex,
-    double? playbackPosition,
-    double? playbackDuration,
-  }) {
-    if (isPlaying != null) _isPlaying = isPlaying;
-    
-    if (currentAudioIndex != null) {
-      _currentAudioIndex = currentAudioIndex;
-      if (currentAudioIndex >= 0 && currentAudioIndex < _audioFiles.length) {
-        _currentAudio = _audioFiles[currentAudioIndex];
-      }
-    }
-    
-    if (playbackPosition != null) {
-      _playbackPosition = playbackPosition;
-    }
-    
-    if (playbackDuration != null) {
-      _playbackDuration = playbackDuration;
-    }
-    
-    // Her durum güncellemesinde dinleyicileri haberdar et
-    notifyListeners();
-  }
-
-  void resetPlaybackState() {
-    _playbackPosition = 0;
-    _playbackDuration = 0;
-    notifyListeners();
   }
 
   // Filtre ayarlarını yükle

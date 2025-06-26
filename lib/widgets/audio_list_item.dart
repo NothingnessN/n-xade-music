@@ -1,134 +1,87 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import '../providers/theme_provider.dart';
 import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
+import '../providers/audio_provider.dart';
 
 class AudioListItem extends StatelessWidget {
-  final String title;
-  final double duration;
-  final VoidCallback onOptionPress;
-  final VoidCallback onAudioPress;
-  final bool isPlaying;
-  final bool activeListItem;
+  final AudioFile audio;
+  final VoidCallback onTap;
+  final VoidCallback onMoreTap;
 
-  AudioListItem({
-    required this.title,
-    required this.duration,
-    required this.onOptionPress,
-    required this.onAudioPress,
-    required this.isPlaying,
-    required this.activeListItem,
-  });
-
-  String _getThumbnailText(String filename) => filename[0].toUpperCase();
-
-  String _convertTime(double seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = (seconds % 60).toInt();
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
+  const AudioListItem({
+    Key? key,
+    required this.audio,
+    required this.onTap,
+    required this.onMoreTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final theme = themeProvider.currentTheme;
+    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final audioProvider = Provider.of<AudioProvider>(context);
+    final isPlaying = audioProvider.isPlaying && audioProvider.currentAudio?.id == audio.id;
+    final isActive = audioProvider.currentAudio?.id == audio.id;
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              // Play/Pause butonu
-              GestureDetector(
-                onTap: onAudioPress,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: theme.textColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _getThumbnailText(title),
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: theme.textColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              
-              SizedBox(width: 15),
-              
-              // Şarkı bilgileri
-              Expanded(
-                child: GestureDetector(
-                  onTap: onAudioPress,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AnimatedDefaultTextStyle(
-                        duration: Duration(milliseconds: 350),
-                        curve: Curves.easeInOut,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: activeListItem && isPlaying
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: activeListItem && isPlaying
-                              ? Color(0xFF660099)
-                              : theme.textColor,
-                        ),
-                        child: Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        _convertTime(duration),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: theme.textColor.withOpacity(0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              SizedBox(width: 10),
-              
-              // Seçenekler butonu
               Container(
                 width: 40,
                 height: 40,
-                child: IconButton(
-                  onPressed: onOptionPress,
-                  icon: Icon(
-                    MdiIcons.dotsVertical,
-                    color: theme.textColor,
-                    size: 20,
-                  ),
-                  padding: EdgeInsets.zero,
+                decoration: BoxDecoration(
+                  color: isActive 
+                    ? theme.accentColor.withOpacity(0.2)
+                    : theme.textColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: Icon(
+                  isPlaying ? Icons.pause : Icons.play_arrow,
+                  color: isActive ? theme.accentColor : theme.textColor,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      audio.filename,
+                      style: TextStyle(
+                        color: isActive ? theme.accentColor : theme.textColor,
+                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                        fontSize: 15,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${(audio.duration / 60).floor()}:${(audio.duration % 60).floor().toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        color: theme.textColor.withOpacity(0.6),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: theme.textColor.withOpacity(0.7),
+                ),
+                onPressed: onMoreTap,
               ),
             ],
           ),
         ),
-        
-        // Ayırıcı çizgi
-        Container(
-          height: 0.5,
-          color: Colors.grey.withOpacity(0.3),
-          margin: EdgeInsets.only(left: 85, right: 20),
-        ),
-      ],
+      ),
     );
   }
 }

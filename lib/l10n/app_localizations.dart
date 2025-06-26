@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'New Playlist'**
   String get new_playlist;
 
+  /// No description provided for @create_playlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Playlist'**
+  String get create_playlist;
+
   /// No description provided for @playlist_title.
   ///
   /// In en, this message translates to:
@@ -199,6 +205,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'songs'**
   String get songs;
+
+  /// No description provided for @choose_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Theme'**
+  String get choose_theme;
+
+  /// No description provided for @delete_playlist_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Playlist'**
+  String get delete_playlist_title;
+
+  /// No description provided for @delete_playlist_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the playlist {playlistName}?'**
+  String delete_playlist_message(Object playlistName);
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @removed_from_playlist.
+  ///
+  /// In en, this message translates to:
+  /// **'{songName} removed from playlist'**
+  String removed_from_playlist(Object songName);
+
+  /// No description provided for @added_to_playlist.
+  ///
+  /// In en, this message translates to:
+  /// **'{songName} added to {playlistName}'**
+  String added_to_playlist(Object songName, Object playlistName);
+
+  /// No description provided for @playlist_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{playlistName} playlist deleted'**
+  String playlist_deleted(Object playlistName);
+
+  /// No description provided for @language_turkish.
+  ///
+  /// In en, this message translates to:
+  /// **'Turkish'**
+  String get language_turkish;
+
+  /// No description provided for @language_english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get language_english;
 }
 
 class _AppLocalizationsDelegate

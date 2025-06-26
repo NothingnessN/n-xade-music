@@ -36,6 +36,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get new_playlist => 'New Playlist';
 
   @override
+  String get create_playlist => 'Create Playlist';
+
+  @override
   String get playlist_title => 'Playlist';
 
   @override
@@ -58,4 +61,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get songs => 'songs';
+
+  @override
+  String get choose_theme => 'Choose Theme';
+
+  @override
+  String get delete_playlist_title => 'Delete Playlist';
+
+  @override
+  String delete_playlist_message(Object playlistName) {
+    return 'Are you sure you want to delete the playlist $playlistName?';
+  }
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String removed_from_playlist(Object songName) {
+    return '$songName removed from playlist';
+  }
+
+  @override
+  String added_to_playlist(Object songName, Object playlistName) {
+    return '$songName added to $playlistName';
+  }
+
+  @override
+  String playlist_deleted(Object playlistName) {
+    return '$playlistName playlist deleted';
+  }
+
+  @override
+  String get language_turkish => 'Turkish';
+
+  @override
+  String get language_english => 'English';
 }

@@ -16,7 +16,7 @@ class ThemeScreen extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'Tema Seç',
+              AppLocalizations.of(context)!.choose_theme,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -87,14 +87,14 @@ class ThemeScreen extends StatelessWidget {
                 Text(AppLocalizations.of(context)!.options + ': '),
                 DropdownButton<Locale>(
                   value: localeProvider.locale ?? Localizations.localeOf(context),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
-                      value: Locale('tr'),
-                      child: Text('Türkçe'),
+                      value: const Locale('tr'),
+                      child: Text(AppLocalizations.of(context)!.language_turkish),
                     ),
                     DropdownMenuItem(
-                      value: Locale('en'),
-                      child: Text('English'),
+                      value: const Locale('en'),
+                      child: Text(AppLocalizations.of(context)!.language_english),
                     ),
                   ],
                   onChanged: (locale) {

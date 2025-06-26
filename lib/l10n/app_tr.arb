@@ -1,19 +1,50 @@
-{
+﻿{
   "hello": "Merhaba",
   "playlist": "Çalma Listesi",
   "add_song": "Şarkı Ekle",
-  "player": "Çalar",
-  "audio_list": "Müzik Listesi",
+  "player": "Oynatıcı",
+  "audio_list": "Ses Listesi",
   "by_nothingnessn": "NothingnessN tarafından",
-  "all_audios": "Tüm Şarkılar",
+  "all_audios": "Tüm Sesler",
   "add_playlist": "Çalma Listesi Ekle",
   "new_playlist": "Yeni Çalma Listesi",
+  "create_playlist": "Çalma Listesi Oluştur",
   "playlist_title": "Çalma Listesi",
   "options": "Seçenekler",
   "add_to_playlist": "Çalma Listesine Ekle",
   "remove_from_playlist": "Çalma Listesinden Kaldır",
   "delete_playlist": "Çalma Listesini Sil",
-  "no_playlists": "Henüz playlist yok",
-  "click_to_create": "Yeni playlist oluşturmak için + butonuna tıklayın",
-  "songs": "şarkı"
-} 
+  "no_playlists": "Henüz çalma listesi yok",
+  "click_to_create": "Yeni bir çalma listesi oluşturmak için + düğmesine tıklayın",
+  "songs": "şarkı",
+  "choose_theme": "Tema Seç",
+  "delete_playlist_title": "Çalma Listesini Sil",
+  "delete_playlist_message": "{playlistName} çalma listesini silmek istediğinizden emin misiniz?",
+  "@delete_playlist_message": {
+    "placeholders": {
+      "playlistName": {}
+    }
+  },
+  "cancel": "İptal",
+  "removed_from_playlist": "{songName} çalma listesinden kaldırıldı",
+  "@removed_from_playlist": {
+    "placeholders": {
+      "songName": {}
+    }
+  },
+  "added_to_playlist": "{songName} şarkısı {playlistName} çalma listesine eklendi",
+  "@added_to_playlist": {
+    "placeholders": {
+      "songName": {},
+      "playlistName": {}
+    }
+  },
+  "playlist_deleted": "{playlistName} çalma listesi silindi",
+  "@playlist_deleted": {
+    "placeholders": {
+      "playlistName": {}
+    }
+  },
+  "language_turkish": "Türkçe",
+  "language_english": "İngilizce"
+}

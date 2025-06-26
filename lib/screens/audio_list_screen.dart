@@ -37,149 +37,123 @@ class AudioListScreen extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                  IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/theme'),
-                    icon: Icon(
-                      Icons.color_lens,
-                      color: theme.accentColor,
-                    ),
+                      IconButton(
+                        onPressed: () => Navigator.pushNamed(context, '/theme'),
+                        icon: Icon(
+                          Icons.color_lens,
+                          color: theme.accentColor,
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
               Expanded(
                 child: ListView.builder(
                   itemCount: audioProvider.audioFiles.length,
                   itemBuilder: (context, index) {
                     final audio = audioProvider.audioFiles[index];
                     return AudioListItem(
-                      title: audio.filename,
-                      duration: audio.duration,
-                      onAudioPress: () async {
-                        await audioProvider.playAtIndex(index, audioController);
-                      },
-                      onOptionPress: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => OptionModal(
-                            filename: audio.filename,
-                            options: audioProvider.playList.isEmpty
-                                ? []
-                                : audioProvider.playList
-                                    .map((playlist) => {
-                                          'title': playlist['title'] as String,
-                                          'onPress': () {
-                                            audioProvider.addAudioToPlaylist(playlist['id'], audio);
-                                            Navigator.pop(context);
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Row(
-                                                  children: [
-                                                    Icon(Icons.check_circle, color: Colors.white),
-                                                    SizedBox(width: 10),
-                                                    Expanded(
-                                                      child: Text(
-                                                        '${audio.filename} ${playlist['title']} playlist\'ine eklendi',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                backgroundColor: theme.accentColor,
-                                                duration: Duration(seconds: 2),
-                                                behavior: SnackBarBehavior.floating,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        })
-                                .toList(),
-                            onClose: () => Navigator.pop(context),
-                            onDeletePress: () async {
-                              // Silme onayı dialogu
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: theme.backgroundColor,
-                                  title: Text(
-                                    'Şarkıyı Sil',
-                                    style: TextStyle(color: theme.textColor),
-                                  ),
-                                  content: Text(
-                                    '${audio.filename} dosyasını cihazdan silmek istediğinizden emin misiniz?',
-                                    style: TextStyle(color: theme.textColor),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        'İptal',
-                                        style: TextStyle(color: theme.textColor.withOpacity(0.7)),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        Navigator.pop(context); // Dialog'u kapat
-                                        Navigator.pop(context); // Modal'ı kapat
-                                        
-                                        try {
-                              final file = File(audio.uri);
-                              await file.delete();
-                              await audioProvider.getAudioFiles();
-                                          
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Icon(Icons.delete, color: Colors.white),
-                                                  SizedBox(width: 10),
-                                                  Expanded(
-                                                    child: Text('${audio.filename} silindi'),
-                                                  ),
-                                                ],
-                                              ),
-                                              backgroundColor: Colors.red,
-                                              duration: Duration(seconds: 2),
-                                              behavior: SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                            ),
-                                          );
-                                        } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Dosya silinirken hata oluştu'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: Text(
-                                        'Sil',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                      audio: audio,
+                      onTap: () async {
+                        audioProvider.resetPlaybackState();
+                        audioProvider.updateState(
+                          currentAudioIndex: index,
+                          isPlaying: true,
                         );
+                        await audioController.play(audio.uri);
                       },
-                      isPlaying: audioProvider.isPlaying &&
-                          audioProvider.currentAudio?.id == audio.id,
-                      activeListItem: audioProvider.currentAudio?.id == audio.id,
+                      onMoreTap: () => _showOptionsModal(audio, context),
                     );
                   },
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showOptionsModal(AudioFile audio, BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context, listen: false).currentTheme;
+    final localizations = AppLocalizations.of(context)!;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.playlist_add, color: theme.textColor),
+              title: Text(
+                localizations.add_to_playlist,
+                style: TextStyle(color: theme.textColor),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showPlaylistModal(audio, context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPlaylistModal(AudioFile audio, BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context, listen: false).currentTheme;
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              localizations.add_to_playlist,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: theme.textColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...audioProvider.playlists.map((playlist) => ListTile(
+              title: Text(
+                playlist['title'],
+                style: TextStyle(color: theme.textColor),
+              ),
+              onTap: () {
+                audioProvider.addAudioToPlaylist(playlist['id'], audio);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      localizations.added_to_playlist(audio.filename, playlist['title'])
+                    ),
+                    backgroundColor: theme.accentColor,
+                  ),
+                );
+              },
+            )).toList(),
+          ],
         ),
       ),
     );

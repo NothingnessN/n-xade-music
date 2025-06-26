@@ -8,6 +8,7 @@
   "all_audios": "All Audios",
   "add_playlist": "Add Playlist",
   "new_playlist": "New Playlist",
+  "create_playlist": "Create Playlist",
   "playlist_title": "Playlist",
   "options": "Options",
   "add_to_playlist": "Add to Playlist",
@@ -15,5 +16,35 @@
   "delete_playlist": "Delete Playlist",
   "no_playlists": "No playlists yet",
   "click_to_create": "Click the + button to create a new playlist",
-  "songs": "songs"
+  "songs": "songs",
+  "choose_theme": "Choose Theme",
+  "delete_playlist_title": "Delete Playlist",
+  "delete_playlist_message": "Are you sure you want to delete the playlist {playlistName}?",
+  "@delete_playlist_message": {
+    "placeholders": {
+      "playlistName": {}
+    }
+  },
+  "cancel": "Cancel",
+  "removed_from_playlist": "{songName} removed from playlist",
+  "@removed_from_playlist": {
+    "placeholders": {
+      "songName": {}
+    }
+  },
+  "added_to_playlist": "{songName} added to {playlistName}",
+  "@added_to_playlist": {
+    "placeholders": {
+      "songName": {},
+      "playlistName": {}
+    }
+  },
+  "playlist_deleted": "{playlistName} playlist deleted",
+  "@playlist_deleted": {
+    "placeholders": {
+      "playlistName": {}
+    }
+  },
+  "language_turkish": "Turkish",
+  "language_english": "English"
 } 

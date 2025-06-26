@@ -159,6 +159,7 @@ class AudioController with ChangeNotifier {
               } else {
                 print('Son şarkıdayız, çalma duracak.');
                 await pause();
+                _audioProvider!.resetPlaybackState();
               }
             }
           }
@@ -178,8 +179,19 @@ class AudioController with ChangeNotifier {
   Future<bool> play(String uri, {Duration? initialPosition, String? title, int? index, AudioProvider? provider}) async {
     try {
       print('🎵 Playing audio: \x1b[32m${uri.split('/').last}\x1b[0m');
-      if (_audioHandler != null) {
-        await _audioHandler!.playAudio(uri, title ?? uri.split('/').last);
+      if (_audioHandler != null && _audioProvider != null) {
+        // Şarkıyı bul
+        final audio = _audioProvider!.audioFiles.firstWhere(
+          (a) => a.uri == uri,
+          orElse: () => AudioFile(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            filename: title ?? uri.split('/').last,
+            uri: uri,
+            duration: 0,
+          ),
+        );
+
+        await _audioHandler!.playAudio(uri, audio);
         if (initialPosition != null) {
           await _audioHandler!.seek(initialPosition);
         }
@@ -226,8 +238,19 @@ class AudioController with ChangeNotifier {
   Future<bool> playNext(String uri, {String? title, int? index, AudioProvider? provider}) async {
     try {
       print('⏭️ Playing next audio: ${uri.split('/').last}');
-      if (_audioHandler != null) {
-        await _audioHandler!.playAudio(uri, title ?? uri.split('/').last);
+      if (_audioHandler != null && _audioProvider != null) {
+        // Şarkıyı bul
+        final audio = _audioProvider!.audioFiles.firstWhere(
+          (a) => a.uri == uri,
+          orElse: () => AudioFile(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            filename: title ?? uri.split('/').last,
+            uri: uri,
+            duration: 0,
+          ),
+        );
+
+        await _audioHandler!.playAudio(uri, audio);
         if (index != null) {
           await storeAudioForNextOpening(uri, index);
         }

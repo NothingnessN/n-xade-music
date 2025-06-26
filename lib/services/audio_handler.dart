@@ -75,14 +75,42 @@ class AknAudioHandler extends BaseAudioHandler {
           isPlaying: playerState.playing,
         );
 
-        // Şarkı bittiğinde tekrarlama kontrolü
         if (playerState.processingState == ProcessingState.completed) {
-          if (_repeatOne && _audioProvider!.currentAudioIndex != null) {
-            final currentIndex = _audioProvider!.currentAudioIndex!;
-            final currentAudio = _audioProvider!.audioFiles[currentIndex];
-            await playAudio(currentAudio.uri ?? '', currentAudio.displayNameWOExt);
+          print('🎵 Şarkı bitti, tekrarlama modu: ${_repeatOne ? 'Açık' : 'Kapalı'}');
+          
+          if (_repeatOne) {
+            if (_audioProvider!.currentAudioIndex != null) {
+              final currentIndex = _audioProvider!.currentAudioIndex!;
+              final currentAudio = _audioProvider!.audioFiles[currentIndex];
+              print('🔄 Aynı şarkı tekrar başlatılıyor: ${currentAudio.filename}');
+              
+              await _player.seek(Duration.zero);
+              await _player.play();
+              
+              _audioProvider!.updateState(
+                currentAudioIndex: currentIndex,
+                isPlaying: true,
+                playbackPosition: 0,
+              );
+            }
           } else {
-            await skipToNext();
+            if (_audioProvider!.currentAudioIndex != null) {
+              int nextIndex = _audioProvider!.currentAudioIndex! + 1;
+              if (nextIndex < _audioProvider!.audioFiles.length) {
+                print('⏭️ Sonraki şarkıya geçiliyor...');
+                final nextAudio = _audioProvider!.audioFiles[nextIndex];
+                await playAudio(nextAudio.uri, nextAudio);
+                
+                _audioProvider!.updateState(
+                  currentAudioIndex: nextIndex,
+                  isPlaying: true,
+                  playbackPosition: 0,
+                );
+              } else {
+                print('📋 Playlist bitti, çalma duruyor.');
+                await stop();
+              }
+            }
           }
         }
       }
@@ -91,6 +119,48 @@ class AknAudioHandler extends BaseAudioHandler {
 
   void setAudioProvider(AudioProvider provider) {
     _audioProvider = provider;
+  }
+
+  Future<void> _updateMediaItem(AudioFile audio) async {
+    mediaItem.add(MediaItem(
+      id: audio.uri,
+      title: audio.filename,
+      artist: audio.artist ?? 'AKN Music',
+      artUri: Uri.parse('android.resource://com.nothingnessn.aknmusic/drawable/notification_logo'),
+      playable: true,
+      displayTitle: audio.filename,
+      displaySubtitle: audio.artist ?? 'AKN Music',
+      duration: _player.duration,
+      extras: {
+        'notification_color': _themeProvider.currentTheme.accentColor.value,
+      },
+    ));
+  }
+
+  Future<void> playAudio(String uri, AudioFile audio) async {
+    try {
+      print('🎵 Şarkı çalınıyor: ${audio.filename}');
+      
+      _audioProvider?.resetPlaybackState();
+      
+      if (_audioProvider != null) {
+        final audioIndex = _audioProvider!.audioFiles.indexWhere((a) => a.uri == uri);
+        if (audioIndex != -1) {
+          _audioProvider!.updateState(
+            currentAudioIndex: audioIndex,
+            isPlaying: true,
+            playbackPosition: 0,
+          );
+        }
+      }
+
+      await _updateMediaItem(audio);
+
+      await _player.setAudioSource(AudioSource.uri(Uri.parse(uri)));
+      await _player.play();
+    } catch (e) {
+      print('❌ Şarkı çalma hatası: $e');
+    }
   }
 
   @override
@@ -137,30 +207,15 @@ class AknAudioHandler extends BaseAudioHandler {
       if (nextIndex < _audioProvider!.audioFiles.length) {
         final audio = _audioProvider!.audioFiles[nextIndex];
         
-        // Önce durumu sıfırla
         _audioProvider!.resetPlaybackState();
+        _audioProvider!.updateState(
+          currentAudioIndex: nextIndex,
+          isPlaying: true,
+          playbackPosition: 0,
+        );
         
-        // Yeni şarkıyı ayarla
-        _audioProvider!.updateState(currentAudioIndex: nextIndex);
-        
-        // MediaItem'ı güncelle
-        mediaItem.add(MediaItem(
-          id: audio.uri ?? '',
-          title: audio.displayNameWOExt,
-          artist: 'AKN Music',
-          artUri: Uri.parse('android.resource://com.nothingnessn.aknmusic/drawable/notification_logo'),
-          playable: true,
-          displayTitle: audio.displayNameWOExt,
-          displaySubtitle: 'AKN Music',
-          duration: _player.duration,
-          extras: {
-            'notification_color': _themeProvider.currentTheme.accentColor.value,
-          },
-        ));
-        
-        // Yeni şarkıyı çal
         await _player.stop();
-        await playAudio(audio.uri ?? '', audio.displayNameWOExt);
+        await playAudio(audio.uri, audio);
       }
     }
   }
@@ -172,74 +227,15 @@ class AknAudioHandler extends BaseAudioHandler {
       if (prevIndex >= 0) {
         final audio = _audioProvider!.audioFiles[prevIndex];
         
-        // Önce durumu sıfırla
         _audioProvider!.resetPlaybackState();
-        
-        // Yeni şarkıyı ayarla
-        _audioProvider!.updateState(currentAudioIndex: prevIndex);
-        
-        // MediaItem'ı güncelle
-        mediaItem.add(MediaItem(
-          id: audio.uri ?? '',
-          title: audio.displayNameWOExt,
-          artist: 'AKN Music',
-          artUri: Uri.parse('android.resource://com.nothingnessn.aknmusic/drawable/notification_logo'),
-          playable: true,
-          displayTitle: audio.displayNameWOExt,
-          displaySubtitle: 'AKN Music',
-          duration: _player.duration,
-          extras: {
-            'notification_color': _themeProvider.currentTheme.accentColor.value,
-          },
-        ));
-        
-        // Yeni şarkıyı çal
-        await _player.stop();
-        await playAudio(audio.uri ?? '', audio.displayNameWOExt);
-      }
-    }
-  }
-
-  Future<void> playAudio(String uri, String title) async {
-    try {
-      final source = AudioSource.uri(Uri.parse(uri));
-      
-      // Önce mevcut çalanı durdur
-      await _player.stop();
-      
-      // Yeni kaynağı ayarla
-      await _player.setAudioSource(source);
-      
-      // MediaItem'ı güncelle
-      mediaItem.add(MediaItem(
-        id: uri,
-        title: title,
-        artist: 'AKN Music',
-        artUri: Uri.parse('android.resource://com.nothingnessn.aknmusic/drawable/notification_logo'),
-        playable: true,
-        displayTitle: title,
-        displaySubtitle: 'AKN Music',
-        duration: _player.duration,
-        extras: {
-          'notification_color': _themeProvider.currentTheme.accentColor.value,
-        },
-      ));
-      
-      // Çalmaya başla
-      await _player.play();
-      
-      // Provider'ı güncelle
-      if (_audioProvider != null) {
         _audioProvider!.updateState(
+          currentAudioIndex: prevIndex,
           isPlaying: true,
           playbackPosition: 0,
-          playbackDuration: _player.duration?.inMilliseconds.toDouble() ?? 0.0,
         );
-      }
-    } catch (e) {
-      print('Error in playAudio: $e');
-      if (_audioProvider != null) {
-        _audioProvider!.updateState(isPlaying: false);
+        
+        await _player.stop();
+        await playAudio(audio.uri, audio);
       }
     }
   }

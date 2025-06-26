@@ -136,27 +136,27 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                 padding: EdgeInsets.only(bottom: 20),
                 child: Column(
                   children: [
-                    Slider(
-                      value: _isSeeking
-                          ? audioController.position
-                          : audioController.position.clamp(
+              Slider(
+                value: _isSeeking
+                    ? audioController.position
+                    : audioController.position.clamp(
                               0.0, audioController.duration),
                       max: audioController.duration,
-                      onChanged: (value) {
-                        setState(() => _isSeeking = true);
-                        audioController.moveAudio(value);
-                      },
-                      onChangeEnd: (value) {
-                        setState(() => _isSeeking = false);
-                      },
-                      activeColor: theme.accentColor,
-                      inactiveColor: theme.textColor.withOpacity(0.3),
-                    ),
+                onChanged: (value) {
+                  setState(() => _isSeeking = true);
+                  audioController.moveAudio(value);
+                },
+                onChangeEnd: (value) {
+                  setState(() => _isSeeking = false);
+                },
+                activeColor: theme.accentColor,
+                inactiveColor: theme.textColor.withOpacity(0.3),
+              ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
                           ValueListenableBuilder<double>(
                             valueListenable: ValueNotifier<double>(audioController.position),
                             builder: (context, position, child) {
@@ -180,36 +180,36 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                                 ),
                               );
                             },
-                          ),
-                        ],
-                      ),
+                  ),
+                ],
+              ),
                     ),
                     const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        PlayerButton(
-                          iconType: 'PREV',
-                          onPress: () => _handlePrevious(audioProvider, audioController),
-                        ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  PlayerButton(
+                    iconType: 'PREV',
+                    onPress: () => _handlePrevious(audioProvider, audioController),
+                  ),
                         SizedBox(width: 20),
-                        PlayerButton(
-                          iconType: audioController.isPlaying ? 'PAUSE' : 'PLAY',
+                  PlayerButton(
+                    iconType: audioController.isPlaying ? 'PAUSE' : 'PLAY',
                           size: 70,
-                          onPress: () async {
-                            if (audioController.isPlaying) {
-                              await audioController.pause();
-                            } else {
-                              await audioController.resume();
-                            }
-                          },
-                        ),
+                    onPress: () async {
+                      if (audioController.isPlaying) {
+                        await audioController.pause();
+                      } else {
+                        await audioController.resume();
+                      }
+                    },
+                  ),
                         SizedBox(width: 20),
-                        PlayerButton(
-                          iconType: 'NEXT',
-                          onPress: () => _handleNext(audioProvider, audioController),
-                        ),
-                      ],
+                  PlayerButton(
+                    iconType: 'NEXT',
+                    onPress: () => _handleNext(audioProvider, audioController),
+                  ),
+                ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,

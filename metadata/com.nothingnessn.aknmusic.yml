@@ -1,1 +1,31 @@
- 
+Categories:
+  - Multimedia
+  - Music & Audio
+License: GPL-3.0-or-later
+AuthorName: NothingnessN
+SourceCode: https://github.com/NothingnessN/akn-music
+IssueTracker: https://github.com/NothingnessN/akn-music/issues
+Changelog: https://github.com/NothingnessN/akn-music/blob/main/CHANGELOG.md
+
+AutoName: AKN Music
+
+RepoType: git
+Repo: https://github.com/NothingnessN/akn-music
+
+Builds:
+  - versionName: '1.12.1'
+    versionCode: 1
+    commit: v1.12.1
+    subdir: android
+    gradle:
+      - yes
+    output: build/app/outputs/flutter-apk/app-release.apk
+    prebuild: echo "flutter.sdk=$FLUTTER_ROOT" >> local.properties
+    build:
+      - flutter pub get
+      - flutter build apk
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.12.1'
+CurrentVersionCode: 1 

@@ -62,7 +62,7 @@ class PlaylistScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No playlists yet',
+                              localizations.no_playlists,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -71,7 +71,7 @@ class PlaylistScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Click the + button to create a new playlist',
+                              localizations.click_to_create,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: theme.textColor.withOpacity(0.7),
@@ -125,6 +125,13 @@ class PlaylistScreen extends StatelessWidget {
                                   color: theme.textColor.withOpacity(0.7),
                                 ),
                               ),
+                              trailing: IconButton(
+                                icon: Icon(
+                                  Icons.more_vert,
+                                  color: theme.textColor,
+                                ),
+                                onPressed: () => _showPlaylistOptionsModal(context, item),
+                              ),
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -158,6 +165,54 @@ class PlaylistScreen extends StatelessWidget {
             Navigator.pop(context);
           }
         },
+      ),
+    );
+  }
+
+  void _showPlaylistOptionsModal(BuildContext context, Map<String, dynamic> playlist) {
+    final theme = Provider.of<ThemeProvider>(context, listen: false).currentTheme;
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.backgroundColor,
+        title: Text(
+          localizations.delete_playlist_title,
+          style: TextStyle(color: theme.textColor),
+        ),
+        content: Text(
+          localizations.delete_playlist_message(playlist['title']),
+          style: TextStyle(color: theme.textColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              localizations.cancel,
+              style: TextStyle(color: theme.textColor),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              audioProvider.deletePlaylist(playlist['id']);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    localizations.playlist_deleted(playlist['title']),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            },
+            child: Text(
+              localizations.delete_playlist,
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -192,7 +192,7 @@ class AudioController with ChangeNotifier {
         );
 
         await _audioHandler!.playAudio(uri, audio);
-        if (initialPosition != null) {
+      if (initialPosition != null) {
           await _audioHandler!.seek(initialPosition);
         }
         if (index != null) {
@@ -212,7 +212,7 @@ class AudioController with ChangeNotifier {
       print('⏸️ Pausing audio');
       if (_audioHandler != null) {
         await _audioHandler!.pause();
-        return true;
+      return true;
       }
       return false;
     } catch (e) {
@@ -226,7 +226,7 @@ class AudioController with ChangeNotifier {
       print('▶️ Resuming audio');
       if (_audioHandler != null) {
         await _audioHandler!.play();
-        return true;
+      return true;
       }
       return false;
     } catch (e) {
@@ -288,7 +288,7 @@ class AudioController with ChangeNotifier {
 
   Future<void> storeAudioForNextOpening(String uri, int index) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
       final audioData = {
         'audio': {
           'id': _audioProvider?.audioFiles[index].id,

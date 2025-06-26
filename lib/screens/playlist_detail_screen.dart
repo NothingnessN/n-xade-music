@@ -61,7 +61,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
               onTap: () {
                 audioProvider.removeAudioFromPlaylist(playlist['id'], audio.id);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
                       localizations.removed_from_playlist(audio.filename)
@@ -90,7 +90,7 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               child: Column(
-                children: [
+        children: [
                   Container(
                     width: 80,
                     height: 80,
@@ -109,21 +109,21 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                     color: Colors.transparent,
                     child: Hero(
                       tag: 'playlist_${widget.playList['id']}',
-                      child: Column(
-                        children: [
+            child: Column(
+              children: [
                           Text(
-                            widget.playList['title'],
-                            style: TextStyle(
+                    widget.playList['title'],
+                    style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: theme.textColor,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                      fontWeight: FontWeight.bold,
+                      color: theme.textColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                           const SizedBox(height: 8),
-                          Text(
+                Text(
                             '${songCount} ${localizations.songs}',
-                            style: TextStyle(
+                  style: TextStyle(
                               fontSize: 16,
                               color: theme.textColor.withOpacity(0.7),
                             ),
@@ -133,28 +133,28 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
                     ),
                   ),
                 ],
-              ),
-            ),
+                  ),
+                ),
             if (widget.playList['audios']?.isNotEmpty ?? false)
-              Expanded(
-                child: ListView.builder(
+                Expanded(
+                  child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   itemCount: widget.playList['audios']?.length ?? 0,
-                  itemBuilder: (context, index) {
+                    itemBuilder: (context, index) {
                     final audio = AudioFile.fromJson(widget.playList['audios'][index]);
-                    return Padding(
+                      return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: AudioListItem(
+                        child: AudioListItem(
                         audio: audio,
                         onTap: () => _playAudio(audio, context),
                         onMoreTap: () => _showOptionsModal(audio, widget.playList, context),
-                      ),
-                    );
-                  },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-          ],
-        ),
+              ],
+            ),
       ),
     );
   }

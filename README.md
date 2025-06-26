@@ -11,21 +11,21 @@
 
 </div>
 
-AKN Music Player, modern ve kullanıcı dostu bir arayüze sahip, açık kaynaklı bir müzik çalar uygulamasıdır. Gizlilik odaklı, reklamsız ve tamamen ücretsiz olarak geliştirilmiştir.
+AKN Music Player is an open-source music player application with a modern and user-friendly interface. It has been developed with a focus on privacy, without ads, and completely free.
 
-## ✨ Özellikler
+## ✨ Features
 
-- 🎨 Modern ve şık kullanıcı arayüzü
-- 🎵 Arka planda çalma desteği
-- 📱 Bildirim paneli kontrolleri
-- 📋 Çalma listesi yönetimi
-- 🔄 Tek şarkı tekrarlama özelliği
-- 🎨 Özelleştirilebilir tema seçenekleri
-- 🔒 Gizlilik odaklı - gereksiz izinler yok
-- 📱 Tüm Android sürümlerinde çalışır (Android 5.0+)
-- 💻 Açık kaynak kodlu
+- 🎨 Modern and elegant user interface
+- 🎵 Background playback support
+- 📱 Notification panel controls
+- 📋 Playlist management
+- 🔄 Single song repeat feature
+- 🎨 Customizable theme options
+- 🔒 Privacy-focused - no unnecessary permissions
+- 📱 Works on all Android versions (Android 5.0+)
+- 💻 Open source
 
-## 📱 Ekran Görüntüleri
+## 📱 Screenshots
 
 <div align="center">
 <img src="metadata/en-US/images/phoneScreenshots/1.png" width="200"/>
@@ -33,75 +33,69 @@ AKN Music Player, modern ve kullanıcı dostu bir arayüze sahip, açık kaynakl
 <img src="metadata/en-US/images/phoneScreenshots/3.png" width="200"/>
 </div>
 
-## 📥 İndirme
+## 📥 Download
 
-[![F-Droid'de mevcut](https://fdroid.gitlab.io/artwork/badge/get-it-on-tr.png)](https://f-droid.org/packages/com.nothingnessn.aknmusic)
+[![Available on F-Droid](https://fdroid.gitlab.io/artwork/badge/get-it-on.png)](https://f-droid.org/packages/com.nothingnessn.aknmusic)
 
-## 🛠️ Kurulum
+## 🛠️ Installation
 
-### Gereksinimler
+### Requirements
 
-- Flutter SDK (3.x veya üzeri)
+- Flutter SDK (3.x or higher)
 - Android Studio / VS Code
 - Android SDK
 - Git
 
-### Geliştirme Ortamının Hazırlanması
+### Setting Up Development Environment
 
-1. Repoyu klonlayın:
+1. Clone the repository:
 ```bash
 git clone https://github.com/yourusername/akn_music_flutter_new.git
 ```
 
-2. Bağımlılıkları yükleyin:
+2. Install dependencies:
 ```bash
 flutter pub get
 ```
 
-3. Uygulamayı çalıştırın:
+3. Run the app:
 ```bash
 flutter run
 ```
 
-## 🤝 Katkıda Bulunma
+## 🤝 Contributing
 
-Katkılarınızı bekliyoruz! Katkıda bulunmak için:
+We welcome your contributions! To contribute:
 
-1. Bu repoyu forklayın
-2. Yeni bir branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'feat: Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request açın
+1. Fork this repository
+2. Create a new branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📝 Lisans
+## 📝 License
 
-Bu proje GNU General Public License v3.0 ile lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-## 📞 İletişim
+## 📞 Contact
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- E-posta: your.email@example.com
+- GitHub: [@NothingnessN](https://github.com/NothingnessN)
+- Instagram: [@nothingnessnxd4rk](https://www.instagram.com/nothingnessnxd4rk/)
+- Instagram 2: [@akn_d3s1gn](https://www.instagram.com/akn_d3s1gn)
+- Email: d4rkxnothing@gmail.com
 
-## 🙏 Teşekkürler
+## 🙏 Acknowledgments
 
-Bu projede kullanılan açık kaynak kütüphaneler:
+Open source libraries used in this project:
 
 - [just_audio](https://pub.dev/packages/just_audio)
 - [audio_service](https://pub.dev/packages/audio_service)
 - [provider](https://pub.dev/packages/provider)
 - [shared_preferences](https://pub.dev/packages/shared_preferences)
 
-## 📋 Yapılacaklar
+## 🐛 Bug Reporting
 
-- [ ] Ekolayzır desteği
-- [ ] Gelişmiş çalma listesi özellikleri
-- [ ] Şarkı sözleri desteği
-- [ ] Karanlık/Aydınlık tema geçişi animasyonu
-- [ ] Çevrimdışı şarkı sözleri desteği
-
-## 🐛 Hata Bildirimi
-
-Bir hata bulduysanız veya yeni bir özellik öneriniz varsa, lütfen [GitHub Issues](https://github.com/yourusername/akn_music_flutter_new/issues) üzerinden bildirin.
+If you find a bug or have a feature request, please report it on [GitHub Issues](https://github.com/yourusername/akn_music_flutter_new/issues).
 
 ---
 

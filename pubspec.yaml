@@ -1,5 +1,5 @@
-name: akn_music
-description: A new Flutter project.
+name: nxade_music
+description: N-Xade Music - A simple, elegant and open source music player by N-Xade Studios
 
 publish_to: 'none'
 
@@ -27,6 +27,9 @@ dependencies:
   google_fonts: ^6.1.0
   on_audio_query: ^2.9.0
   permission_handler: ^11.3.1
+  in_app_purchase: ^3.1.13
+  in_app_purchase_android: ^0.3.6+1
+  google_mobile_ads: ^4.0.0
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2

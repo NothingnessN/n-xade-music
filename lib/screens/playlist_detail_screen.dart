@@ -5,8 +5,8 @@ import '../widgets/screen.dart';
 import '../providers/audio_provider.dart';
 import '../providers/audio_controller.dart';
 import '../widgets/audio_list_item.dart';
-import '../widgets/option_modal.dart';
-import 'package:akn_music/l10n/app_localizations.dart';
+
+import 'package:nxade_music/l10n/app_localizations.dart';
 
 class PlaylistDetailScreen extends StatefulWidget {
   final Map<String, dynamic> playList;
@@ -24,15 +24,26 @@ class _PlaylistDetailScreenState extends State<PlaylistDetailScreen> {
     
     audioProvider.resetPlaybackState();
     
-    final audioIndex = audioProvider.audioFiles.indexWhere((a) => a.id == audio.id);
-    if (audioIndex != -1) {
-      audioProvider.updateState(
-        currentAudioIndex: audioIndex,
-        isPlaying: true,
-      );
-    }
+    // Playlist modunu başlat
+    final playlistSongs = (widget.playList['audios'] as List<dynamic>?)
+        ?.map((e) => AudioFile.fromJson(e))
+        .toList() ?? [];
     
-    await audioController.play(audio.uri);
+    final songIndexInPlaylist = playlistSongs.indexWhere((song) => song.id == audio.id);
+    if (songIndexInPlaylist != -1) {
+      audioProvider.startPlaylistMode(widget.playList, songIndexInPlaylist);
+      
+      // Ana şarkı listesindeki index'ini bul
+      final audioIndex = audioProvider.audioFiles.indexWhere((a) => a.id == audio.id);
+      if (audioIndex != -1) {
+        audioProvider.updateState(
+          currentAudioIndex: audioIndex,
+          isPlaying: true,
+        );
+      }
+      
+      await audioController.play(audio.uri);
+    }
   }
 
   void _showOptionsModal(AudioFile audio, Map<String, dynamic> playlist, BuildContext context) {

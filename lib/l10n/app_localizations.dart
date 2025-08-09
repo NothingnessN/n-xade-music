@@ -128,11 +128,11 @@ abstract class AppLocalizations {
   /// **'Audio List'**
   String get audio_list;
 
-  /// No description provided for @by_nothingnessn.
+  /// No description provided for @by_nxade_studios.
   ///
   /// In en, this message translates to:
-  /// **'By NothingnessN'**
-  String get by_nothingnessn;
+  /// **'By N-Xade Studios'**
+  String get by_nxade_studios;
 
   /// No description provided for @all_audios.
   ///
@@ -259,6 +259,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get language_english;
+
+  /// No description provided for @themes.
+  ///
+  /// In en, this message translates to:
+  /// **'Themes'**
+  String get themes;
+
+  /// No description provided for @premium_themes.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Themes'**
+  String get premium_themes;
+
+  /// No description provided for @free_themes.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Themes'**
+  String get free_themes;
+
+  /// No description provided for @purchase_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Theme'**
+  String get purchase_theme;
+
+  /// No description provided for @theme_purchased.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme purchased!'**
+  String get theme_purchased;
+
+  /// No description provided for @purchase_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed!'**
+  String get purchase_failed;
+
+  /// No description provided for @premium_theme_unlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium theme unlocked!'**
+  String get premium_theme_unlocked;
+
+  /// No description provided for @playing_from.
+  ///
+  /// In en, this message translates to:
+  /// **'Playing from:'**
+  String get playing_from;
 }
 
 class _AppLocalizationsDelegate

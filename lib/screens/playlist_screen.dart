@@ -4,7 +4,8 @@ import '../providers/audio_provider.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/screen.dart';
 import '../widgets/playlist_input_modal.dart';
-import 'package:akn_music/l10n/app_localizations.dart';
+import '../widgets/banner_ad_widget.dart';
+import 'package:nxade_music/l10n/app_localizations.dart';
 import '../screens/playlist_detail_screen.dart';
 
 class PlaylistScreen extends StatelessWidget {
@@ -143,6 +144,10 @@ class PlaylistScreen extends StatelessWidget {
                         },
                       ),
               ),
+              const Spacer(),
+              // Banner reklam
+              const BannerAdWidget(),
+              const SizedBox(height: 10),
             ],
           ),
         ),

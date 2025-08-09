@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:akn_music/l10n/app_localizations.dart';
+import 'package:nxade_music/l10n/app_localizations.dart';
 
 class OptionModal extends StatelessWidget {
   final String filename;

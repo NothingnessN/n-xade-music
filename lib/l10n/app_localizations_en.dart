@@ -24,7 +24,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audio_list => 'Audio List';
 
   @override
-  String get by_nothingnessn => 'By NothingnessN';
+  String get by_nxade_studios => 'By N-Xade Studios';
 
   @override
   String get all_audios => 'All Audios';
@@ -96,4 +96,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language_english => 'English';
+
+  @override
+  String get themes => 'Themes';
+
+  @override
+  String get premium_themes => 'Premium Themes';
+
+  @override
+  String get free_themes => 'Free Themes';
+
+  @override
+  String get purchase_theme => 'Purchase Theme';
+
+  @override
+  String get theme_purchased => 'Theme purchased!';
+
+  @override
+  String get purchase_failed => 'Purchase failed!';
+
+  @override
+  String get premium_theme_unlocked => 'Premium theme unlocked!';
+
+  @override
+  String get playing_from => 'Playing from:';
 }

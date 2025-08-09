@@ -22,7 +22,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="AKN Music"
+        android:label="N-Xade Music"
         android:enableOnBackInvokedCallback="true">
 
         <activity
@@ -66,5 +66,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/notification_logo" />
+            
+        <!-- Test AdMob ID kullanarak reklamların gözükmesini sağlayalım -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
     </application>
 </manifest>

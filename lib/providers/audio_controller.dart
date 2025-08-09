@@ -48,24 +48,33 @@ class AudioController with ChangeNotifier {
 
   Future<void> _setupAudioHandler() async {
     try {
+      print('🎵 Setting up AudioHandler...');
+      print('🎵 _themeProvider: ${_themeProvider != null ? 'NOT NULL' : 'NULL'}');
+      
       _audioHandler = await AudioService.init(
         builder: () => AknAudioHandler(_themeProvider),
         config: AudioServiceConfig(
-          androidNotificationChannelId: 'com.nothingnessn.aknmusic.channel.audio',
-          androidNotificationChannelName: 'AKN Music',
+                      androidNotificationChannelId: 'com.nxadestudios.nxademusic.channel.audio',
+          androidNotificationChannelName: 'N-Xade Music',
           androidNotificationOngoing: false,
           androidStopForegroundOnPause: true,
           androidShowNotificationBadge: true,
           notificationColor: _themeProvider.currentTheme.accentColor,
         ),
       );
+      print('🎵 AudioHandler created: ${_audioHandler != null ? 'SUCCESS' : 'FAILED'}');
 
       if (_audioProvider != null) {
+        print('🎵 Setting AudioProvider in AudioHandler...');
         _audioHandler?.setAudioProvider(_audioProvider!);
+        print('🎵 AudioProvider set successfully');
+      } else {
+        print('⚠️ AudioProvider is NULL, cannot set in AudioHandler');
       }
 
       // AudioHandler durumunu dinle
       _audioHandler?.playbackState.listen((state) {
+        print('🎵 Playback state changed: ${state.playing ? 'PLAYING' : 'PAUSED'}');
         _isPlaying = state.playing;
         _position = state.position.inMilliseconds.toDouble();
         if (_audioProvider != null) {
@@ -80,6 +89,7 @@ class AudioController with ChangeNotifier {
       // MediaItem durumunu dinle
       _audioHandler?.mediaItem.listen((mediaItem) {
         if (mediaItem != null) {
+          print('🎵 Media item updated: ${mediaItem.title}');
           _duration = mediaItem.duration?.inMilliseconds.toDouble() ?? 0.0;
           if (_audioProvider != null) {
             _audioProvider!.updateState(
@@ -91,7 +101,7 @@ class AudioController with ChangeNotifier {
       });
 
     } catch (e) {
-      print('Error setting up audio handler: $e');
+      print('❌ Error setting up audio handler: $e');
       rethrow;
     }
   }
@@ -145,21 +155,44 @@ class AudioController with ChangeNotifier {
       if (state.processingState == ProcessingState.completed && !_isAutoNexting) {
         _isAutoNexting = true;
         if (_audioProvider != null && _audioProvider!.audioFiles.isNotEmpty) {
-          int? currentIndex = _audioProvider!.currentAudioIndex;
+          int currentIndex = _audioProvider!.currentAudioIndex;
           print('Şarkı bitti, mevcut index: $currentIndex, repeatOne: $_repeatOne');
-          if (currentIndex != null) {
+          if (currentIndex >= 0) {
             if (_repeatOne) {
               print('Tekrar aynı şarkı başlatılıyor: $currentIndex');
-              await _audioProvider!.playAtIndex(currentIndex, this);
-            } else {
-              int nextIndex = currentIndex + 1;
-              if (nextIndex < _audioProvider!.audioFiles.length) {
-                print('Sonraki şarkı başlatılıyor: $nextIndex');
-                await _audioProvider!.playAtIndex(nextIndex, this);
+              if (_audioProvider!.isPlayListRunning) {
+                // Playlist modunda, mevcut şarkıyı tekrar çal
+                final currentAudio = _audioProvider!.currentAudio;
+                if (currentAudio != null) {
+                  await play(currentAudio.uri, title: currentAudio.filename);
+                }
               } else {
-                print('Son şarkıdayız, çalma duracak.');
-                await pause();
-                _audioProvider!.resetPlaybackState();
+                await _audioProvider!.playAtIndex(currentIndex, this);
+              }
+            } else {
+              // Playlist modunda mı kontrol et
+              if (_audioProvider!.isPlayListRunning) {
+                final nextPlaylistIndex = _audioProvider!.getNextSongIndexInPlaylist();
+                if (nextPlaylistIndex != null) {
+                  print('Playlist\'te sonraki şarkı başlatılıyor: $nextPlaylistIndex');
+                  await _audioProvider!.playPlaylistSongAtIndex(nextPlaylistIndex, this);
+                } else {
+                  print('Playlist sonu, çalma duracak ve playlist modundan çıkılacak.');
+                  await pause();
+                  _audioProvider!.exitPlaylistMode();
+                  _audioProvider!.resetPlaybackState();
+                }
+              } else {
+                // Normal mod - tüm şarkı listesinden sonrakine geç
+                int nextIndex = currentIndex + 1;
+                if (nextIndex < _audioProvider!.audioFiles.length) {
+                  print('Sonraki şarkı başlatılıyor: $nextIndex');
+                  await _audioProvider!.playAtIndex(nextIndex, this);
+                } else {
+                  print('Son şarkıdayız, çalma duracak.');
+                  await pause();
+                  _audioProvider!.resetPlaybackState();
+                }
               }
             }
           }
@@ -210,9 +243,17 @@ class AudioController with ChangeNotifier {
   Future<bool> pause() async {
     try {
       print('⏸️ Pausing audio');
+      print('⏸️ _audioHandler: ${_audioHandler != null ? 'NOT NULL' : 'NULL'}');
+      print('⏸️ _audioProvider: ${_audioProvider != null ? 'NOT NULL' : 'NULL'}');
+      print('⏸️ _isPlaying: $_isPlaying');
+      
       if (_audioHandler != null) {
         await _audioHandler!.pause();
-      return true;
+        print('⏸️ Pause successful');
+        return true;
+      } else {
+        print('❌ _audioHandler is NULL!');
+        print('❌ AudioHandler setup needed!');
       }
       return false;
     } catch (e) {
@@ -224,9 +265,17 @@ class AudioController with ChangeNotifier {
   Future<bool> resume() async {
     try {
       print('▶️ Resuming audio');
+      print('▶️ _audioHandler: ${_audioHandler != null ? 'NOT NULL' : 'NULL'}');
+      print('▶️ _audioProvider: ${_audioProvider != null ? 'NOT NULL' : 'NULL'}');
+      print('▶️ _isPlaying: $_isPlaying');
+      
       if (_audioHandler != null) {
         await _audioHandler!.play();
-      return true;
+        print('▶️ Resume successful');
+        return true;
+      } else {
+        print('❌ _audioHandler is NULL!');
+        print('❌ AudioHandler setup needed!');
       }
       return false;
     } catch (e) {

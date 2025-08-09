@@ -5,7 +5,8 @@ import '../providers/audio_controller.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/player_button.dart';
 import '../widgets/screen.dart';
-import 'package:akn_music/l10n/app_localizations.dart';
+import '../widgets/banner_ad_widget.dart';
+import 'package:nxade_music/l10n/app_localizations.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({Key? key}) : super(key: key);
@@ -56,195 +57,273 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
     final audioController = Provider.of<AudioController>(context);
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
-    return Screen(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Text(
-                AppLocalizations.of(context)!.by_nothingnessn,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: theme.textColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              AnimatedSwitcher(
-                duration: Duration(milliseconds: 400),
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
-                child: Text(
-                  audioProvider.currentAudio?.filename ?? '',
-                  key: ValueKey(audioProvider.currentAudio?.id ?? ''),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: theme.textColor,
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          image: theme.backgroundImage != null
+              ? DecorationImage(
+                  image: AssetImage(theme.backgroundImage!),
+                  fit: BoxFit.cover,
+                )
+              : theme.gradientColors != null
+                  ? null
+                  : null,
+          gradient: theme.gradientColors != null
+              ? LinearGradient(
+                  colors: theme.gradientColors!,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: theme.backgroundImage == null && theme.gradientColors == null
+              ? theme.backgroundColor
+              : null,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Üst kısım - sabit yükseklik
+                SizedBox(
+                  height: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.by_nxade_studios,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: theme.textColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.8,
+                        ),
+                        child: AnimatedSwitcher(
+                          duration: Duration(milliseconds: 400),
+                          transitionBuilder: (child, animation) => FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                          child: Text(
+                            audioProvider.currentAudio?.filename ?? '',
+                            key: ValueKey(audioProvider.currentAudio?.id ?? ''),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: theme.textColor,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 20),
-              if (audioProvider.isPlayListRunning && audioProvider.activePlayList != null)
-                Text(
-                  'Playing from: ${audioProvider.activePlayList!['title'] ?? 'Unknown Playlist'}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: theme.textColor.withOpacity(0.7),
-                  ),
-                ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: Center(
-                  child: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 500),
-                    transitionBuilder: (child, animation) => ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    ),
-                    child: Container(
-                      key: ValueKey(audioProvider.currentAudio?.id ?? ''),
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      height: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.accentColor.withOpacity(0.4),
-                            blurRadius: 30,
-                            spreadRadius: 8,
+                
+                // Orta kısım - esnek yükseklik
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Single music note icon
+                      Container(
+                        width: 200,
+                        height: 200,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: theme.backgroundImage != null
+                              ? Image.asset(
+                                  theme.backgroundImage!,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: theme.backgroundImage == null && theme.gradientColors == null ? theme.backgroundColor : null,
+                                    gradient: theme.gradientColors != null
+                                        ? LinearGradient(
+                                            colors: theme.gradientColors!,
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          )
+                                        : null,
+                                  ),
+                                  child: Icon(
+                                    Icons.music_note,
+                                    size: 80,
+                                    color: theme.textColor,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      
+                      if (audioProvider.isPlayListRunning && audioProvider.activePlayList != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          margin: EdgeInsets.only(bottom: 15),
+                          decoration: BoxDecoration(
+                            color: theme.accentColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                            '${AppLocalizations.of(context)!.playing_from} ${audioProvider.activePlayList!['title'] ?? 'Unknown Playlist'}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.accentColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      
+                      // Player controls
+                      Column(
+                        children: [
+                          Slider(
+                            value: _isSeeking
+                                ? audioController.position
+                                : audioController.position.clamp(0.0, audioController.duration),
+                            max: audioController.duration,
+                            onChanged: (value) {
+                              setState(() => _isSeeking = true);
+                              audioController.moveAudio(value);
+                            },
+                            onChangeEnd: (value) {
+                              setState(() => _isSeeking = false);
+                            },
+                            activeColor: theme.accentColor,
+                            inactiveColor: theme.textColor.withOpacity(0.3),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ValueListenableBuilder<double>(
+                                  valueListenable: ValueNotifier<double>(audioController.position),
+                                  builder: (context, position, child) {
+                                    return Text(
+                                      _formatDuration(position),
+                                      style: TextStyle(
+                                        color: theme.textColor,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ValueListenableBuilder<double>(
+                                  valueListenable: ValueNotifier<double>(audioController.duration),
+                                  builder: (context, duration, child) {
+                                    return Text(
+                                      _formatDuration(duration),
+                                      style: TextStyle(
+                                        color: theme.textColor,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PlayerButton(
+                                iconType: 'PREV',
+                                onPress: () async {
+                                  print('🔄 Previous button pressed');
+                                  await _handlePrevious(audioProvider, audioController);
+                                },
+                              ),
+                              SizedBox(width: 20),
+                              PlayerButton(
+                                iconType: audioController.isPlaying ? 'PAUSE' : 'PLAY',
+                                size: 60,
+                                onPress: () async {
+                                  print('🎵 Play/Pause button pressed');
+                                  if (audioController.isPlaying) {
+                                    print('⏸️ Pausing...');
+                                    await audioController.pause();
+                                  } else {
+                                    print('▶️ Resuming...');
+                                    await audioController.resume();
+                                  }
+                                },
+                              ),
+                              SizedBox(width: 20),
+                              PlayerButton(
+                                iconType: 'NEXT',
+                                onPress: () async {
+                                  print('⏭️ Next button pressed');
+                                  await _handleNext(audioProvider, audioController);
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 15),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  final audioController = Provider.of<AudioController>(context, listen: false);
+                                  audioController.setRepeatOne(!audioController.repeatOne);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: audioController.repeatOne ? theme.accentColor : Colors.white.withOpacity(0.3),
+                                  ),
+                                  child: Text(
+                                    '1',
+                                    style: TextStyle(
+                                      color: audioController.repeatOne
+                                          ? Colors.white
+                                          : (Provider.of<ThemeProvider>(context).selectedThemeKey == 'light'
+                                              ? Colors.black
+                                              : Colors.white.withOpacity(0.7)),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: Image.asset(
-                          audioController.isPlaying ? 'assets/6.png' : 'assets/7.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.only(bottom: 20),
-                child: Column(
-                  children: [
-              Slider(
-                value: _isSeeking
-                    ? audioController.position
-                    : audioController.position.clamp(
-                              0.0, audioController.duration),
-                      max: audioController.duration,
-                onChanged: (value) {
-                  setState(() => _isSeeking = true);
-                  audioController.moveAudio(value);
-                },
-                onChangeEnd: (value) {
-                  setState(() => _isSeeking = false);
-                },
-                activeColor: theme.accentColor,
-                inactiveColor: theme.textColor.withOpacity(0.3),
-              ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                          ValueListenableBuilder<double>(
-                            valueListenable: ValueNotifier<double>(audioController.position),
-                            builder: (context, position, child) {
-                              return Text(
-                                _formatDuration(position),
-                                style: TextStyle(
-                                  color: theme.textColor,
-                                  fontSize: 14,
-                                ),
-                              );
-                            },
-                          ),
-                          ValueListenableBuilder<double>(
-                            valueListenable: ValueNotifier<double>(audioController.duration),
-                            builder: (context, duration, child) {
-                              return Text(
-                                _formatDuration(duration),
-                                style: TextStyle(
-                                  color: theme.textColor,
-                                  fontSize: 14,
-                                ),
-                              );
-                            },
-                  ),
-                ],
-              ),
-                    ),
-                    const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  PlayerButton(
-                    iconType: 'PREV',
-                    onPress: () => _handlePrevious(audioProvider, audioController),
-                  ),
-                        SizedBox(width: 20),
-                  PlayerButton(
-                    iconType: audioController.isPlaying ? 'PAUSE' : 'PLAY',
-                          size: 70,
-                    onPress: () async {
-                      if (audioController.isPlaying) {
-                        await audioController.pause();
-                      } else {
-                        await audioController.resume();
-                      }
-                    },
-                  ),
-                        SizedBox(width: 20),
-                  PlayerButton(
-                    iconType: 'NEXT',
-                    onPress: () => _handleNext(audioProvider, audioController),
-                  ),
-                ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            final audioController = Provider.of<AudioController>(context, listen: false);
-                            audioController.setRepeatOne(!audioController.repeatOne);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: audioController.repeatOne ? theme.accentColor : Colors.white.withOpacity(0.3),
-                            ),
-                            child: Text(
-                              '1',
-                              style: TextStyle(
-                                color: audioController.repeatOne
-                                    ? Colors.white
-                                    : (Provider.of<ThemeProvider>(context).selectedThemeKey == 'light'
-                                        ? Colors.black
-                                        : Colors.white.withOpacity(0.7)),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                
+                // Alt kısım - sabit yükseklik
+                SizedBox(
+                  height: 60,
+                  child: const BannerAdWidget(),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -259,18 +338,38 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
   }
 
   Future<void> _handleNext(AudioProvider audioProvider, AudioController audioController) async {
-    int? currentIndex = audioProvider.currentAudioIndex;
-    if (currentIndex == null) return;
-    int nextIndex = currentIndex + 1;
-    if (nextIndex >= audioProvider.audioFiles.length) nextIndex = 0;
-    await audioProvider.playAtIndex(nextIndex, audioController);
+    if (audioProvider.isPlayListRunning) {
+      // Playlist modunda - sadece playlist içinde geç
+      final nextPlaylistIndex = audioProvider.getNextSongIndexInPlaylist();
+      if (nextPlaylistIndex != null) {
+        await audioProvider.playPlaylistSongAtIndex(nextPlaylistIndex, audioController);
+      }
+      // Playlist sonu ise hiçbir şey yapma
+    } else {
+      // Normal mod - tüm şarkı listesinde geç
+      int currentIndex = audioProvider.currentAudioIndex;
+      if (currentIndex < 0) return;
+      int nextIndex = currentIndex + 1;
+      if (nextIndex >= audioProvider.audioFiles.length) nextIndex = 0;
+      await audioProvider.playAtIndex(nextIndex, audioController);
+    }
   }
 
   Future<void> _handlePrevious(AudioProvider audioProvider, AudioController audioController) async {
-    int? currentIndex = audioProvider.currentAudioIndex;
-    if (currentIndex == null) return;
-    int prevIndex = currentIndex - 1;
-    if (prevIndex < 0) prevIndex = audioProvider.audioFiles.length - 1;
-    await audioProvider.playAtIndex(prevIndex, audioController);
+    if (audioProvider.isPlayListRunning) {
+      // Playlist modunda - sadece playlist içinde geç
+      final prevPlaylistIndex = audioProvider.getPreviousSongIndexInPlaylist();
+      if (prevPlaylistIndex != null) {
+        await audioProvider.playPlaylistSongAtIndex(prevPlaylistIndex, audioController);
+      }
+      // Playlist başı ise hiçbir şey yapma
+    } else {
+      // Normal mod - tüm şarkı listesinde geç
+      int currentIndex = audioProvider.currentAudioIndex;
+      if (currentIndex < 0) return;
+      int prevIndex = currentIndex - 1;
+      if (prevIndex < 0) prevIndex = audioProvider.audioFiles.length - 1;
+      await audioProvider.playAtIndex(prevIndex, audioController);
+    }
   }
 }

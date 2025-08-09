@@ -4,7 +4,7 @@
   "add_song": "Add Song",
   "player": "Player",
   "audio_list": "Audio List",
-  "by_nothingnessn": "By NothingnessN",
+  "by_nxade_studios": "By N-Xade Studios",
   "all_audios": "All Audios",
   "add_playlist": "Add Playlist",
   "new_playlist": "New Playlist",
@@ -46,5 +46,13 @@
     }
   },
   "language_turkish": "Turkish",
-  "language_english": "English"
+  "language_english": "English",
+  "themes": "Themes",
+  "premium_themes": "Premium Themes",
+  "free_themes": "Free Themes",
+  "purchase_theme": "Purchase Theme",
+  "theme_purchased": "Theme purchased!",
+  "purchase_failed": "Purchase failed!",
+  "premium_theme_unlocked": "Premium theme unlocked!",
+  "playing_from": "Playing from:"
 } 

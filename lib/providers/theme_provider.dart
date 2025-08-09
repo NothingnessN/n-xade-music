@@ -291,10 +291,16 @@ class ThemeProvider with ChangeNotifier {
 
   Future<void> setTheme(String themeKey) async {
     if (themes.containsKey(themeKey)) {
+      print('🎨 Setting theme: $themeKey');
+      print('🎨 Theme details: ${themes[themeKey]}');
       _selectedThemeKey = themeKey;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selectedTheme', themeKey);
+      print('🎨 Theme saved to preferences: $themeKey');
       notifyListeners();
+      print('🎨 Listeners notified');
+    } else {
+      print('❌ Theme not found: $themeKey');
     }
   }
 

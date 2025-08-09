@@ -2,7 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import '../providers/audio_provider.dart';
 import '../providers/theme_provider.dart';
-import 'package:flutter/material.dart';
+
 
 class AknAudioHandler extends BaseAudioHandler {
   final AudioPlayer _player = AudioPlayer();
@@ -125,11 +125,11 @@ class AknAudioHandler extends BaseAudioHandler {
     mediaItem.add(MediaItem(
       id: audio.uri,
       title: audio.filename,
-      artist: audio.artist ?? 'AKN Music',
-      artUri: Uri.parse('android.resource://com.nothingnessn.aknmusic/drawable/notification_logo'),
+              artist: audio.artist ?? 'N-Xade Music',
+              artUri: Uri.parse('android.resource://com.nxadestudios.nxademusic/drawable/notification_logo'),
       playable: true,
       displayTitle: audio.filename,
-      displaySubtitle: audio.artist ?? 'AKN Music',
+              displaySubtitle: audio.artist ?? 'N-Xade Music',
       duration: _player.duration,
       extras: {
         'notification_color': _themeProvider.currentTheme.accentColor.value,

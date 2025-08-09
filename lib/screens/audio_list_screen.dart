@@ -3,11 +3,9 @@ import 'package:provider/provider.dart';
 import '../providers/audio_provider.dart';
 import '../providers/audio_controller.dart';
 import '../providers/theme_provider.dart';
-import '../widgets/option_modal.dart';
 import '../widgets/screen.dart';
 import '../widgets/audio_list_item.dart';
-import 'dart:io';
-import 'package:akn_music/l10n/app_localizations.dart';
+import 'package:nxade_music/l10n/app_localizations.dart';
 
 class AudioListScreen extends StatelessWidget {
   const AudioListScreen({Key? key}) : super(key: key);
@@ -58,6 +56,8 @@ class AudioListScreen extends StatelessWidget {
                       audio: audio,
                       onTap: () async {
                         audioProvider.resetPlaybackState();
+                        // Playlist modundan çık (normal mod)
+                        audioProvider.exitPlaylistMode();
                         audioProvider.updateState(
                           currentAudioIndex: index,
                           isPlaying: true,

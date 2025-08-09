@@ -4,7 +4,7 @@ import '../providers/theme_provider.dart';
 import 'audio_list_screen.dart';
 import 'player_screen.dart';
 import 'playlist_screen.dart';
-import 'package:akn_music/l10n/app_localizations.dart';
+import 'package:nxade_music/l10n/app_localizations.dart';
 
 class AppNavigator extends StatefulWidget {
   @override

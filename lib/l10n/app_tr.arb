@@ -4,7 +4,7 @@
   "add_song": "Şarkı Ekle",
   "player": "Oynatıcı",
   "audio_list": "Ses Listesi",
-  "by_nothingnessn": "NothingnessN tarafından",
+  "by_nxade_studios": "N-Xade Studios tarafından",
   "all_audios": "Tüm Sesler",
   "add_playlist": "Çalma Listesi Ekle",
   "new_playlist": "Yeni Çalma Listesi",
@@ -46,5 +46,13 @@
     }
   },
   "language_turkish": "Türkçe",
-  "language_english": "İngilizce"
+  "language_english": "İngilizce",
+  "themes": "Temalar",
+  "premium_themes": "Premium Temalar",
+  "free_themes": "Ücretsiz Temalar",
+  "purchase_theme": "Tema Satın Al",
+  "theme_purchased": "Tema satın alındı!",
+  "purchase_failed": "Satın alma başarısız!",
+  "premium_theme_unlocked": "Premium tema açıldı!",
+  "playing_from": "Çalma listesinden:"
 }

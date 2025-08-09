@@ -3,11 +3,25 @@ Categories:
   - Music & Audio
 License: GPL-3.0-or-later
 AuthorName: NothingnessN
+AuthorEmail: oyuncucaliskan4555@gmail.com
+WebSite: https://github.com/NothingnessN/akn-music
 SourceCode: https://github.com/NothingnessN/akn-music
 IssueTracker: https://github.com/NothingnessN/akn-music/issues
 Changelog: https://github.com/NothingnessN/akn-music/blob/main/CHANGELOG.md
+Donate: https://github.com/sponsors/NothingnessN
 
 AutoName: AKN Music
+Summary: Yerel müzik çalar uygulaması
+Description: |
+    AKN Music, yerel müzik dosyalarınızı çalmak için tasarlanmış basit ve kullanışlı bir müzik çalar uygulamasıdır.
+    
+    Özellikler:
+    * Yerel müzik dosyalarını çalma
+    * Çalma listeleri oluşturma ve yönetme
+    * Karanlık/Aydınlık tema desteği
+    * Türkçe ve İngilizce dil desteği
+    * Arka planda çalma
+    * Bildirim kontrolü
 
 RepoType: git
 Repo: https://github.com/NothingnessN/akn-music

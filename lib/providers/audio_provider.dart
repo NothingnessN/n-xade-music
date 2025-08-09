@@ -3,6 +3,7 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'audio_controller.dart';
+import '../services/debug_logger.dart';
 
 class AudioFile {
   final String id;
@@ -98,6 +99,14 @@ class AudioProvider with ChangeNotifier {
   AudioFile? get addToPlayList => _addToPlayList;
   Map<String, dynamic>? get activePlayList => _activePlayList;
   bool get isPlayListRunning => _isPlayListRunning;
+  
+  // Aktif playlist'teki şarkıların listesi
+  List<AudioFile> get currentPlaylistSongs {
+    if (_activePlayList == null) return [];
+    return (_activePlayList!['audios'] as List<dynamic>?)
+        ?.map((e) => AudioFile.fromJson(e))
+        .toList() ?? [];
+  }
 
   AudioProvider() {
     _loadPlaylists();
@@ -109,7 +118,7 @@ class AudioProvider with ChangeNotifier {
     if (_isRequestingPermission || _hasPermission) return;
     _isRequestingPermission = true;
     try {
-      print('🔐 on_audio_query için izin isteniyor...');
+      DebugLogger.log('🔐 on_audio_query için izin isteniyor...');
       var permissionStatus = await _audioQuery.permissionsStatus();
       if (permissionStatus) {
         _hasPermission = true;
@@ -120,11 +129,11 @@ class AudioProvider with ChangeNotifier {
           _hasPermission = true;
           await _getAudioFiles();
         } else {
-          print('❌ on_audio_query izni reddedildi');
+          DebugLogger.log('❌ on_audio_query izni reddedildi');
         }
       }
     } catch (e) {
-      print('❌ on_audio_query izin hatası: $e');
+      DebugLogger.log('❌ on_audio_query izin hatası: $e');
     } finally {
       _isRequestingPermission = false;
       notifyListeners();
@@ -144,18 +153,28 @@ class AudioProvider with ChangeNotifier {
       _audioFiles = [];
       for (var song in songs) {
         if (song.isMusic == true && song.fileExtension != null) {
-          // Şarkı adını düzgün bir şekilde al
-          String songTitle = song.title ?? '';
-          // Eğer title boşsa veya sayısal bir değerse displayName'i kullan
-          if (songTitle.isEmpty || RegExp(r'^\d+$').hasMatch(songTitle)) {
-            songTitle = song.displayName ?? songTitle;
+          // Öncelikle displayNameWOExt kullan (uzantısız dosya adı)
+          String songTitle = song.displayNameWOExt ?? '';
+          
+          // Eğer displayNameWOExt boşsa, displayName'i kullan ve uzantıyı kaldır
+          if (songTitle.isEmpty) {
+            songTitle = song.displayName ?? '';
+            // Uzantıyı kaldır
+            final lastDot = songTitle.lastIndexOf('.');
+            if (lastDot != -1) {
+              songTitle = songTitle.substring(0, lastDot);
+            }
           }
-          // Hala boşsa veya sayısal değerse displayNameWOExt'i kullan
+          
+          // Hala boşsa veya sadece sayısal değerse title'ı kullan
           if (songTitle.isEmpty || RegExp(r'^\d+$').hasMatch(songTitle)) {
-            songTitle = song.displayNameWOExt ?? songTitle;
+            songTitle = song.title ?? 'Unknown Song';
           }
-          // Uzantıyı kaldır
-          songTitle = songTitle.replaceAll(RegExp(r'\.[^.]*$'), '');
+          
+          // Son kontrol - boşsa varsayılan değer
+          if (songTitle.isEmpty) {
+            songTitle = 'Unknown Song';
+          }
           
           final audioFile = AudioFile(
             id: song.id.toString(),
@@ -182,13 +201,18 @@ class AudioProvider with ChangeNotifier {
   Future<void> loadPreviousAudio() async {
     final prefs = await SharedPreferences.getInstance();
     final previousAudioJson = prefs.getString('previousAudio');
-    if (previousAudioJson != null) {
+    if (previousAudioJson != null && _audioFiles.isNotEmpty) {
       final previousAudio = jsonDecode(previousAudioJson);
-      _currentAudio = _audioFiles.firstWhere(
-        (audio) => audio.id == previousAudio['audio']['id'],
-        orElse: () => _audioFiles.isNotEmpty ? _audioFiles[0] : null as AudioFile,
-      );
-      _currentAudioIndex = previousAudio['index'];
+      try {
+        _currentAudio = _audioFiles.firstWhere(
+          (audio) => audio.id == previousAudio['audio']['id'],
+        );
+        _currentAudioIndex = previousAudio['index'];
+      } catch (e) {
+        // Eğer önceki audio bulunamazsa, ilk audio'yu seç
+        _currentAudio = _audioFiles[0];
+        _currentAudioIndex = 0;
+      }
     } else if (_audioFiles.isNotEmpty) {
       _currentAudio = _audioFiles[0];
       _currentAudioIndex = 0;
@@ -265,6 +289,13 @@ class AudioProvider with ChangeNotifier {
   }
 
   void deletePlaylist(String playlistId) {
+    // Eğer silinen playlist aktif playlist ise, oynatıcı durumunu temizle
+    if (_activePlayList != null && _activePlayList!['id'] == playlistId) {
+      print('🔄 Active playlist deleted, clearing player state');
+      _activePlayList = null;
+      _isPlayListRunning = false;
+    }
+    
     _playlists.removeWhere((playlist) => playlist['id'] == playlistId);
     _savePlaylists();
     notifyListeners();
@@ -400,14 +431,97 @@ class AudioProvider with ChangeNotifier {
   bool get excludeVoiceFiles => _excludeVoiceFiles;
   bool get excludeAppFiles => _excludeAppFiles;
 
+  // Playlist çalma modunu başlat
+  void startPlaylistMode(Map<String, dynamic> playlist, int songIndex) {
+    _activePlayList = playlist;
+    _isPlayListRunning = true;
+    _currentAudioIndex = songIndex;
+    notifyListeners();
+    DebugLogger.log('🎵 Playlist çalma modu başlatıldı: ${playlist['name']}, şarkı index: $songIndex');
+  }
+  
+  // Normal çalma moduna dön (tüm şarkı listesi)
+  void exitPlaylistMode() {
+    _activePlayList = null;
+    _isPlayListRunning = false;
+    notifyListeners();
+    DebugLogger.log('🎵 Playlist çalma modu bitti, normal moda döndü');
+  }
+  
+  // Playlist'te sonraki şarkının index'ini al
+  int? getNextSongIndexInPlaylist() {
+    if (!_isPlayListRunning || _activePlayList == null) return null;
+    
+    final playlistSongs = currentPlaylistSongs;
+    if (playlistSongs.isEmpty) return null;
+    
+    // Mevcut şarkının playlist içindeki index'ini bul
+    final currentAudio = _currentAudio;
+    if (currentAudio == null) return null;
+    
+    final currentPlaylistIndex = playlistSongs.indexWhere((song) => song.id == currentAudio.id);
+    if (currentPlaylistIndex == -1) return null;
+    
+    // Sonraki şarkı var mı?
+    if (currentPlaylistIndex + 1 < playlistSongs.length) {
+      return currentPlaylistIndex + 1;
+    }
+    
+    return null; // Son şarkıdayız
+  }
+  
+  // Playlist'te önceki şarkının index'ini al
+  int? getPreviousSongIndexInPlaylist() {
+    if (!_isPlayListRunning || _activePlayList == null) return null;
+    
+    final playlistSongs = currentPlaylistSongs;
+    if (playlistSongs.isEmpty) return null;
+    
+    // Mevcut şarkının playlist içindeki index'ini bul
+    final currentAudio = _currentAudio;
+    if (currentAudio == null) return null;
+    
+    final currentPlaylistIndex = playlistSongs.indexWhere((song) => song.id == currentAudio.id);
+    if (currentPlaylistIndex == -1) return null;
+    
+    // Önceki şarkı var mı?
+    if (currentPlaylistIndex > 0) {
+      return currentPlaylistIndex - 1;
+    }
+    
+    return null; // İlk şarkıdayız
+  }
+
   Future<void> playAtIndex(int index, AudioController audioController) async {
-    print('playAtIndex çağrıldı, index: $index, şarkı: ${_audioFiles[index].filename}');
+    DebugLogger.log('playAtIndex çağrıldı, index: $index, şarkı: ${_audioFiles[index].filename}');
     if (index < 0 || index >= _audioFiles.length) return;
     _currentAudioIndex = index;
     _currentAudio = _audioFiles[index];
     _isPlaying = true;
     notifyListeners(); // UI hemen güncellenir
     await audioController.play(_audioFiles[index].uri, title: _audioFiles[index].filename, index: index, provider: this);
-    print('playAtIndex tamamlandı, index: $index, şarkı: ${_audioFiles[index].filename}');
+    DebugLogger.log('playAtIndex tamamlandı, index: $index, şarkı: ${_audioFiles[index].filename}');
+  }
+  
+  // Playlist'te belirli bir şarkıyı çal
+  Future<void> playPlaylistSongAtIndex(int playlistSongIndex, AudioController audioController) async {
+    if (!_isPlayListRunning || _activePlayList == null) return;
+    
+    final playlistSongs = currentPlaylistSongs;
+    if (playlistSongIndex < 0 || playlistSongIndex >= playlistSongs.length) return;
+    
+    final songToPlay = playlistSongs[playlistSongIndex];
+    
+    // Ana şarkı listesindeki index'ini bul
+    final mainIndex = _audioFiles.indexWhere((audio) => audio.id == songToPlay.id);
+    if (mainIndex == -1) return;
+    
+    _currentAudioIndex = mainIndex;
+    _currentAudio = songToPlay;
+    _isPlaying = true;
+    notifyListeners();
+    
+    await audioController.play(songToPlay.uri, title: songToPlay.filename, index: mainIndex, provider: this);
+    DebugLogger.log('Playlist şarkısı çalınıyor: ${songToPlay.filename} (playlist index: $playlistSongIndex)');
   }
 }

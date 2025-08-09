@@ -1,110 +1,193 @@
 import 'package:flutter/material.dart';
 import '../providers/theme_provider.dart';
+import '../providers/premium_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:akn_music/l10n/app_localizations.dart';
+import 'package:nxade_music/l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
+import '../widgets/premium_theme_card.dart';
 
 class ThemeScreen extends StatelessWidget {
+  
+  Future<void> _handlePurchase(BuildContext context, PremiumProvider premiumProvider, String themeKey) async {
+    final success = await premiumProvider.purchaseTheme(themeKey);
+    
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.theme_purchased),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(premiumProvider.errorMessage ?? AppLocalizations.of(context)!.purchase_failed),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final premiumProvider = Provider.of<PremiumProvider>(context);
     final themeKeys = themeProvider.themes.keys.toList();
     final localeProvider = Provider.of<LocaleProvider>(context);
 
+    // Premium olmayan temaları filtrele
+    final freeThemeKeys = themeKeys.where((key) => !premiumProvider.isPremiumTheme(key)).toList();
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Text(
-              AppLocalizations.of(context)!.choose_theme,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: themeProvider.currentTheme.textColor,
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.themes),
+        actions: [
+          // Dil değiştirme butonu
+          IconButton(
+            icon: Icon(
+              (localeProvider.locale?.languageCode ?? 'tr') == 'tr' 
+                ? Icons.language 
+                : Icons.translate,
+            ),
+            onPressed: () {
+              final currentLang = localeProvider.locale?.languageCode ?? 'tr';
+              final newLocale = currentLang == 'tr' 
+                ? const Locale('en') 
+                : const Locale('tr');
+              localeProvider.setLocale(newLocale);
+            },
+            tooltip: (localeProvider.locale?.languageCode ?? 'tr') == 'tr' 
+              ? 'Switch to English' 
+              : 'Türkçeye geç',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Premium temalar
+          if (PremiumProvider.premiumThemeIds.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                AppLocalizations.of(context)!.premium_themes,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: PremiumProvider.premiumThemeIds.length,
+                itemBuilder: (context, index) {
+                  final themeKey = PremiumProvider.premiumThemeIds[index];
+                  return PremiumThemeCard(
+                    themeKey: themeKey,
+                    onPurchase: () => _handlePurchase(context, premiumProvider, themeKey),
+                    onTap: () {
+                      // Premium tema seçildiğinde (eğer satın alınmışsa)
+                      print('🎨 Premium theme selected: $themeKey');
+                      themeProvider.setTheme(themeKey);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+          
+          // Ücretsiz temalar
+          if (freeThemeKeys.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                AppLocalizations.of(context)!.free_themes,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
             Expanded(
               child: GridView.builder(
-                padding: EdgeInsets.all(16),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                padding: const EdgeInsets.all(16.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1.5,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
                 ),
-                itemCount: themeKeys.length,
+                itemCount: freeThemeKeys.length,
                 itemBuilder: (context, index) {
-                  final themeKey = themeKeys[index];
+                  final themeKey = freeThemeKeys[index];
                   final theme = themeProvider.themes[themeKey]!;
                   final isSelected = themeProvider.selectedThemeKey == themeKey;
 
                   return GestureDetector(
-                    onTap: () => themeProvider.setTheme(themeKey),
+                    onTap: () {
+                      print('🎨 Theme selected: $themeKey');
+                      themeProvider.setTheme(themeKey);
+                    },
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: isSelected
-                            ? Border.all(color: Color(0xFF660099), width: 4)
-                            : Border.all(color: Colors.transparent, width: 2),
-                        gradient: theme.gradientColors != null
-                            ? LinearGradient(colors: theme.gradientColors!)
-                            : null,
-                        color: theme.gradientColors == null
-                            ? theme.backgroundColor
-                            : null,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected ? theme.accentColor : Colors.transparent,
+                          width: 3,
+                        ),
                         image: theme.backgroundImage != null
                             ? DecorationImage(
                                 image: AssetImage(theme.backgroundImage!),
                                 fit: BoxFit.cover,
                               )
                             : null,
+                        color: theme.backgroundImage == null && theme.gradientColors == null ? theme.backgroundColor : null,
+                        gradient: theme.gradientColors != null
+                            ? LinearGradient(
+                                colors: theme.gradientColors!,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : null,
                       ),
-                      child: Center(
-                        child: Text(
-                          themeKey,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 10,
-                                color: Colors.black45,
-                                offset: Offset(-1, 1),
+                      child: Stack(
+                        children: [
+                          if (theme.backgroundImage == null && theme.gradientColors == null)
+                            Center(
+                              child: Icon(
+                                Icons.palette,
+                                size: 50,
+                                color: theme.textColor,
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          if (theme.gradientColors != null)
+                            Center(
+                              child: Icon(
+                                Icons.gradient,
+                                size: 50,
+                                color: Colors.white,
+                              ),
+                            ),
+                          if (isSelected)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: theme.accentColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   );
                 },
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(AppLocalizations.of(context)!.options + ': '),
-                DropdownButton<Locale>(
-                  value: localeProvider.locale ?? Localizations.localeOf(context),
-                  items: [
-                    DropdownMenuItem(
-                      value: const Locale('tr'),
-                      child: Text(AppLocalizations.of(context)!.language_turkish),
-                    ),
-                    DropdownMenuItem(
-                      value: const Locale('en'),
-                      child: Text(AppLocalizations.of(context)!.language_english),
-                    ),
-                  ],
-                  onChanged: (locale) {
-                    if (locale != null) localeProvider.setLocale(locale);
-                  },
-                ),
-              ],
-            ),
           ],
-        ),
+        ],
       ),
     );
   }

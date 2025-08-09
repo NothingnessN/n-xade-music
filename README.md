@@ -1,8 +1,8 @@
-# AKN Music Player 🎵
+# N-Xade Music Player 🎵
 
 <div align="center">
 
-![AKN Music Logo](assets/8.png)
+![N-Xade Music Logo](assets/8.png)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://www.android.com)
@@ -32,10 +32,6 @@ AKN Music Player is an open-source music player application with a modern and us
 <img src="metadata/en-US/images/phoneScreenshots/2.png" width="200"/>
 <img src="metadata/en-US/images/phoneScreenshots/3.png" width="200"/>
 </div>
-
-## 📥 Download
-
-[![Available on F-Droid](https://fdroid.gitlab.io/artwork/badge/get-it-on.png)](https://f-droid.org/packages/com.nothingnessn.aknmusic)
 
 ## 🛠️ Installation
 

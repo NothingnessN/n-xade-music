@@ -317,11 +317,9 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                   ),
                 ),
                 
-                // Alt kısım - sabit yükseklik
-                SizedBox(
-                  height: 60,
-                  child: const BannerAdWidget(),
-                ),
+                // Alt kısım - reklam boyutuna göre dinamik yükseklik
+                const SizedBox(height: 8),
+                const BannerAdWidget(),
               ],
             ),
           ),

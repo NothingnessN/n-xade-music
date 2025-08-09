@@ -111,6 +111,11 @@ class AudioProvider with ChangeNotifier {
   AudioProvider() {
     _loadPlaylists();
     _loadFilterSettings();
+    // İzin isteğini dışarıdan, ilk frame'den sonra tetikleyeceğiz
+  }
+
+  void ensurePermissionRequested() {
+    if (_hasPermission || _isRequestingPermission) return;
     _requestPermission();
   }
 

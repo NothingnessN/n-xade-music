@@ -12,15 +12,31 @@ class BannerAdWidget extends StatefulWidget {
 class _BannerAdWidgetState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
+  AdSize? _adSize;
 
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadBannerAd(context));
   }
 
-  void _loadBannerAd() {
-    _bannerAd = AdService.createBannerAd();
+  void _loadBannerAd(BuildContext context) async {
+    final mediaQuery = MediaQuery.of(context);
+    final deviceWidth = mediaQuery.size.width;
+    // Genişliğe göre uygun banner boyutu seç
+    if (deviceWidth >= 728) {
+      _adSize = AdSize.leaderboard; // 728x90
+    } else if (deviceWidth >= 468) {
+      _adSize = AdSize.fullBanner; // 468x60
+    } else if (deviceWidth >= 320) {
+      _adSize = AdSize.banner; // 320x50
+    } else {
+      _adSize = AdSize.banner;
+    }
+
+    final AdSize resolvedSize = _adSize!;
+    _bannerAd = AdService.createBannerAdWithSize(resolvedSize);
+
     _bannerAd!.load().then((_) {
       if (mounted) {
         setState(() {
@@ -41,13 +57,9 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded || _bannerAd == null) {
-      return Container(
-        height: 50,
+      return SizedBox(
+        height: (_adSize?.height ?? 50).toDouble(),
         width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
         child: const Center(
           child: Text(
             'Reklam yükleniyor...',
@@ -57,13 +69,10 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
       );
     }
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: _bannerAd!.size.height.toDouble(),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: AdWidget(ad: _bannerAd!),
-      ),
+      child: AdWidget(ad: _bannerAd!),
     );
   }
-} 
+}

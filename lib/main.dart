@@ -96,6 +96,10 @@ class MyApp extends StatelessWidget {
 
         return Consumer3<ThemeProvider, LocaleProvider, PremiumProvider>(
           builder: (context, themeProvider, localeProvider, premiumProvider, _) {
+            // İlk frame'den sonra izin isteğini tetikle
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Provider.of<AudioProvider>(context, listen: false).ensurePermissionRequested();
+            });
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'N-Xade Music',

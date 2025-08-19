@@ -111,29 +111,49 @@ class AudioProvider with ChangeNotifier {
   AudioProvider() {
     _loadPlaylists();
     _loadFilterSettings();
+    // İzin isteğini dışarıdan, ilk frame'den sonra tetikleyeceğiz
+  }
+
+  void ensurePermissionRequested() {
+    if (_hasPermission || _isRequestingPermission) return;
     _requestPermission();
   }
 
   Future<void> _requestPermission() async {
     if (_isRequestingPermission || _hasPermission) return;
     _isRequestingPermission = true;
+    notifyListeners(); // UI'ı güncelle
+    
     try {
       DebugLogger.log('🔐 on_audio_query için izin isteniyor...');
+      
+      // Önce mevcut izin durumunu kontrol et
       var permissionStatus = await _audioQuery.permissionsStatus();
+      DebugLogger.log('📋 Mevcut izin durumu: $permissionStatus');
+      
       if (permissionStatus) {
+        DebugLogger.log('✅ İzin zaten verilmiş');
         _hasPermission = true;
         await _getAudioFiles();
       } else {
+        DebugLogger.log('🔐 İzin isteniyor...');
         var hasPermission = await _audioQuery.permissionsRequest();
+        DebugLogger.log('📋 İzin sonucu: $hasPermission');
+        
         if (hasPermission) {
+          DebugLogger.log('✅ İzin verildi');
           _hasPermission = true;
+          // İzin verildikten sonra kısa bir bekleme süresi ekle
+          await Future.delayed(Duration(milliseconds: 500));
           await _getAudioFiles();
         } else {
           DebugLogger.log('❌ on_audio_query izni reddedildi');
+          // İzin reddedildiğinde uygulamayı durdurmak yerine sadece log yaz
         }
       }
     } catch (e) {
       DebugLogger.log('❌ on_audio_query izin hatası: $e');
+      // Hata durumunda uygulamayı durdurmak yerine sadece log yaz
     } finally {
       _isRequestingPermission = false;
       notifyListeners();
@@ -142,57 +162,71 @@ class AudioProvider with ChangeNotifier {
 
   Future<void> _getAudioFiles() async {
     try {
-      print('🔍 on_audio_query ile tarama başlatıldı...');
+      DebugLogger.log('🔍 on_audio_query ile tarama başlatıldı...');
+      
+      // Tarama öncesi kısa bir bekleme
+      await Future.delayed(Duration(milliseconds: 200));
+      
       final songs = await _audioQuery.querySongs(
         sortType: SongSortType.DISPLAY_NAME,
         orderType: OrderType.ASC_OR_SMALLER,
         uriType: UriType.EXTERNAL,
         ignoreCase: true,
       );
-      print('📊 ${songs.length} şarkı bulundu');
+      DebugLogger.log('📊 ${songs.length} şarkı bulundu');
+      
       _audioFiles = [];
       for (var song in songs) {
-        if (song.isMusic == true && song.fileExtension != null) {
-          // Öncelikle displayNameWOExt kullan (uzantısız dosya adı)
-          String songTitle = song.displayNameWOExt ?? '';
-          
-          // Eğer displayNameWOExt boşsa, displayName'i kullan ve uzantıyı kaldır
-          if (songTitle.isEmpty) {
-            songTitle = song.displayName ?? '';
-            // Uzantıyı kaldır
-            final lastDot = songTitle.lastIndexOf('.');
-            if (lastDot != -1) {
-              songTitle = songTitle.substring(0, lastDot);
+        try {
+          if (song.isMusic == true && song.fileExtension != null) {
+            // Öncelikle displayNameWOExt kullan (uzantısız dosya adı)
+            String songTitle = song.displayNameWOExt ?? '';
+            
+            // Eğer displayNameWOExt boşsa, displayName'i kullan ve uzantıyı kaldır
+            if (songTitle.isEmpty) {
+              songTitle = song.displayName ?? '';
+              // Uzantıyı kaldır
+              final lastDot = songTitle.lastIndexOf('.');
+              if (lastDot != -1) {
+                songTitle = songTitle.substring(0, lastDot);
+              }
             }
+            
+            // Hala boşsa veya sadece sayısal değerse title'ı kullan
+            if (songTitle.isEmpty || RegExp(r'^\d+$').hasMatch(songTitle)) {
+              songTitle = song.title ?? 'Unknown Song';
+            }
+            
+            // Son kontrol - boşsa varsayılan değer
+            if (songTitle.isEmpty) {
+              songTitle = 'Unknown Song';
+            }
+            
+            final audioFile = AudioFile(
+              id: song.id.toString(),
+              filename: songTitle,
+              uri: song.uri ?? '',
+              duration: (song.duration ?? 0) / 1000.0,
+              artist: song.artist ?? 'Unknown Artist',
+              album: song.album ?? 'Unknown Album',
+              size: song.size,
+            );
+            _audioFiles.add(audioFile);
           }
-          
-          // Hala boşsa veya sadece sayısal değerse title'ı kullan
-          if (songTitle.isEmpty || RegExp(r'^\d+$').hasMatch(songTitle)) {
-            songTitle = song.title ?? 'Unknown Song';
-          }
-          
-          // Son kontrol - boşsa varsayılan değer
-          if (songTitle.isEmpty) {
-            songTitle = 'Unknown Song';
-          }
-          
-          final audioFile = AudioFile(
-            id: song.id.toString(),
-            filename: songTitle,
-            uri: song.uri ?? '',
-            duration: (song.duration ?? 0) / 1000.0,
-            artist: song.artist ?? 'Unknown Artist',
-            album: song.album ?? 'Unknown Album',
-            size: song.size,
-          );
-          _audioFiles.add(audioFile);
+        } catch (songError) {
+          DebugLogger.log('⚠️ Şarkı işlenirken hata: $songError');
+          continue; // Bu şarkıyı atla, diğerlerine devam et
         }
       }
+      
       _audioFiles.sort((a, b) => a.filename.toLowerCase().compareTo(b.filename.toLowerCase()));
       notifyListeners();
-      print('🎉 on_audio_query ile ${_audioFiles.length} ses dosyası yüklendi');
+      DebugLogger.log('🎉 on_audio_query ile ${_audioFiles.length} ses dosyası yüklendi');
     } catch (e) {
-      print('❌ on_audio_query tarama hatası: $e');
+      DebugLogger.log('❌ on_audio_query tarama hatası: $e');
+      // Hata durumunda boş liste ile devam et
+      _audioFiles = [];
+      notifyListeners();
     }
   }
 

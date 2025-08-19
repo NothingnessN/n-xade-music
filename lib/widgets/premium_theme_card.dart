@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/premium_provider.dart';
+import '../providers/locale_provider.dart';
 
 class PremiumThemeCard extends StatelessWidget {
   final String themeKey;
@@ -19,6 +20,7 @@ class PremiumThemeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final premiumProvider = Provider.of<PremiumProvider>(context);
+    final localeProvider = Provider.of<LocaleProvider>(context);
     final theme = themeProvider.themes[themeKey];
     
     if (theme == null) return SizedBox.shrink();
@@ -26,6 +28,9 @@ class PremiumThemeCard extends StatelessWidget {
     final isPurchased = premiumProvider.isThemePurchased(themeKey);
     final isPremium = premiumProvider.isPremiumTheme(themeKey);
     final isLoading = premiumProvider.isLoading;
+    final currentLocale = localeProvider.locale?.languageCode ?? 'en';
+    final themeName = premiumProvider.getThemeName(themeKey, currentLocale);
+    final themePrice = premiumProvider.getThemePrice(themeKey, currentLocale);
 
     return GestureDetector(
       onTap: isPurchased ? () {
@@ -79,30 +84,55 @@ class PremiumThemeCard extends StatelessWidget {
                 ),
               ),
               
+              // Tema ismi (üst kısım)
+              Positioned(
+                top: 8,
+                left: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    themeName,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              
               // Premium badge
               if (isPremium && !isPurchased)
                 Positioned(
-                  top: 8,
+                  top: 35,
                   right: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.amber,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.star,
-                          size: 12,
+                          size: 10,
                           color: Colors.white,
                         ),
                         const SizedBox(width: 2),
                         Text(
                           'PREMIUM',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 8,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -115,17 +145,17 @@ class PremiumThemeCard extends StatelessWidget {
               // Kilit ikonu (premium ve satın alınmamış)
               if (isPremium && !isPurchased)
                 Positioned(
-                  top: 8,
+                  top: 35,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.6),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.lock,
-                      size: 16,
+                      size: 12,
                       color: Colors.white,
                     ),
                   ),
@@ -134,17 +164,17 @@ class PremiumThemeCard extends StatelessWidget {
               // Satın alınmış badge
               if (isPurchased)
                 Positioned(
-                  top: 8,
+                  top: 35,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: Colors.green,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.check,
-                      size: 16,
+                      size: 12,
                       color: Colors.white,
                     ),
                   ),
@@ -163,7 +193,7 @@ class PremiumThemeCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      premiumProvider.getThemePrice(themeKey),
+                      themePrice,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -210,7 +240,7 @@ class PremiumThemeCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              'Satın Al',
+                              currentLocale == 'tr' ? 'Satın Al' : 'Buy',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,

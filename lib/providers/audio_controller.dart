@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'audio_provider.dart';
 import 'theme_provider.dart';
 import '../services/audio_handler.dart';
+import '../services/debug_logger.dart';
 
 class AudioController with ChangeNotifier {
   final AudioPlayer _player = AudioPlayer();
@@ -48,13 +49,16 @@ class AudioController with ChangeNotifier {
 
   Future<void> _setupAudioHandler() async {
     try {
-      print('🎵 Setting up AudioHandler...');
-      print('🎵 _themeProvider: ${_themeProvider != null ? 'NOT NULL' : 'NULL'}');
+      DebugLogger.log('🎵 Setting up AudioHandler...');
+      DebugLogger.log('🎵 _themeProvider: ${_themeProvider != null ? 'NOT NULL' : 'NULL'}');
+      
+      // AudioHandler başlatma öncesi kısa bir bekleme
+      await Future.delayed(Duration(milliseconds: 300));
       
       _audioHandler = await AudioService.init(
         builder: () => AknAudioHandler(_themeProvider),
         config: AudioServiceConfig(
-                      androidNotificationChannelId: 'com.nxadestudios.nxademusic.channel.audio',
+          androidNotificationChannelId: 'com.nxadestudios.nxademusic.channel.audio',
           androidNotificationChannelName: 'N-Xade Music',
           androidNotificationOngoing: false,
           androidStopForegroundOnPause: true,
@@ -62,19 +66,19 @@ class AudioController with ChangeNotifier {
           notificationColor: _themeProvider.currentTheme.accentColor,
         ),
       );
-      print('🎵 AudioHandler created: ${_audioHandler != null ? 'SUCCESS' : 'FAILED'}');
+      DebugLogger.log('🎵 AudioHandler created: ${_audioHandler != null ? 'SUCCESS' : 'FAILED'}');
 
       if (_audioProvider != null) {
-        print('🎵 Setting AudioProvider in AudioHandler...');
+        DebugLogger.log('🎵 Setting AudioProvider in AudioHandler...');
         _audioHandler?.setAudioProvider(_audioProvider!);
-        print('🎵 AudioProvider set successfully');
+        DebugLogger.log('🎵 AudioProvider set successfully');
       } else {
-        print('⚠️ AudioProvider is NULL, cannot set in AudioHandler');
+        DebugLogger.log('⚠️ AudioProvider is NULL, cannot set in AudioHandler');
       }
 
       // AudioHandler durumunu dinle
       _audioHandler?.playbackState.listen((state) {
-        print('🎵 Playback state changed: ${state.playing ? 'PLAYING' : 'PAUSED'}');
+        DebugLogger.log('🎵 Playback state changed: ${state.playing ? 'PLAYING' : 'PAUSED'}');
         _isPlaying = state.playing;
         _position = state.position.inMilliseconds.toDouble();
         if (_audioProvider != null) {
@@ -89,7 +93,7 @@ class AudioController with ChangeNotifier {
       // MediaItem durumunu dinle
       _audioHandler?.mediaItem.listen((mediaItem) {
         if (mediaItem != null) {
-          print('🎵 Media item updated: ${mediaItem.title}');
+          DebugLogger.log('🎵 Media item updated: ${mediaItem.title}');
           _duration = mediaItem.duration?.inMilliseconds.toDouble() ?? 0.0;
           if (_audioProvider != null) {
             _audioProvider!.updateState(
@@ -101,8 +105,9 @@ class AudioController with ChangeNotifier {
       });
 
     } catch (e) {
-      print('❌ Error setting up audio handler: $e');
-      rethrow;
+      DebugLogger.log('❌ Error setting up audio handler: $e');
+      // Hata durumunda uygulamayı durdurmak yerine sadece log yaz
+      // AudioHandler olmadan da uygulama çalışabilir
     }
   }
 
@@ -119,87 +124,104 @@ class AudioController with ChangeNotifier {
   }
 
   Future<void> _setupPlayer() async {
-    print('🎵 Setting up player');
-    
-    // Pozisyon değişikliklerini dinle
-    _player.positionStream.listen((position) {
-      _position = position.inMilliseconds.toDouble();
-      if (_audioProvider != null) {
-        _audioProvider!.updateState(
-          playbackPosition: _position,
-        );
-      }
-      notifyListeners();
-      print('Position updated: ${_formatDuration(_position)}');
-    });
-
-    // Süre değişikliklerini dinle
-    _player.durationStream.listen((duration) {
-      if (duration != null) {
-        _duration = duration.inMilliseconds.toDouble();
-        if (_audioProvider != null) {
-          _audioProvider!.updateState(
-            playbackDuration: _duration,
-          );
+    try {
+      DebugLogger.log('🎵 Setting up player');
+      
+      // Pozisyon değişikliklerini dinle
+      _player.positionStream.listen((position) {
+        try {
+          _position = position.inMilliseconds.toDouble();
+          if (_audioProvider != null) {
+            _audioProvider!.updateState(
+              playbackPosition: _position,
+            );
+          }
+          notifyListeners();
+          DebugLogger.log('Position updated: ${_formatDuration(_position)}');
+        } catch (e) {
+          DebugLogger.log('❌ Position stream hatası: $e');
         }
-        notifyListeners();
-        print('Duration updated: ${_formatDuration(_duration)}');
-      }
-    });
+      });
 
-    _player.playerStateStream.listen((state) async {
-      _isPlaying = state.playing;
-      _isLoaded = state.processingState != ProcessingState.idle;
-      notifyListeners();
+      // Süre değişikliklerini dinle
+      _player.durationStream.listen((duration) {
+        try {
+          if (duration != null) {
+            _duration = duration.inMilliseconds.toDouble();
+            if (_audioProvider != null) {
+              _audioProvider!.updateState(
+                playbackDuration: _duration,
+              );
+            }
+            notifyListeners();
+            DebugLogger.log('Duration updated: ${_formatDuration(_duration)}');
+          }
+        } catch (e) {
+          DebugLogger.log('❌ Duration stream hatası: $e');
+        }
+      });
 
-      if (state.processingState == ProcessingState.completed && !_isAutoNexting) {
-        _isAutoNexting = true;
-        if (_audioProvider != null && _audioProvider!.audioFiles.isNotEmpty) {
-          int currentIndex = _audioProvider!.currentAudioIndex;
-          print('Şarkı bitti, mevcut index: $currentIndex, repeatOne: $_repeatOne');
-          if (currentIndex >= 0) {
-            if (_repeatOne) {
-              print('Tekrar aynı şarkı başlatılıyor: $currentIndex');
-              if (_audioProvider!.isPlayListRunning) {
-                // Playlist modunda, mevcut şarkıyı tekrar çal
-                final currentAudio = _audioProvider!.currentAudio;
-                if (currentAudio != null) {
-                  await play(currentAudio.uri, title: currentAudio.filename);
-                }
-              } else {
-                await _audioProvider!.playAtIndex(currentIndex, this);
-              }
-            } else {
-              // Playlist modunda mı kontrol et
-              if (_audioProvider!.isPlayListRunning) {
-                final nextPlaylistIndex = _audioProvider!.getNextSongIndexInPlaylist();
-                if (nextPlaylistIndex != null) {
-                  print('Playlist\'te sonraki şarkı başlatılıyor: $nextPlaylistIndex');
-                  await _audioProvider!.playPlaylistSongAtIndex(nextPlaylistIndex, this);
+      _player.playerStateStream.listen((state) async {
+        try {
+          _isPlaying = state.playing;
+          _isLoaded = state.processingState != ProcessingState.idle;
+          notifyListeners();
+
+          if (state.processingState == ProcessingState.completed && !_isAutoNexting) {
+            _isAutoNexting = true;
+            if (_audioProvider != null && _audioProvider!.audioFiles.isNotEmpty) {
+              int currentIndex = _audioProvider!.currentAudioIndex;
+              DebugLogger.log('Şarkı bitti, mevcut index: $currentIndex, repeatOne: $_repeatOne');
+              if (currentIndex >= 0) {
+                if (_repeatOne) {
+                  DebugLogger.log('Tekrar aynı şarkı başlatılıyor: $currentIndex');
+                  if (_audioProvider!.isPlayListRunning) {
+                    // Playlist modunda, mevcut şarkıyı tekrar çal
+                    final currentAudio = _audioProvider!.currentAudio;
+                    if (currentAudio != null) {
+                      await play(currentAudio.uri, title: currentAudio.filename);
+                    }
+                  } else {
+                    await _audioProvider!.playAtIndex(currentIndex, this);
+                  }
                 } else {
-                  print('Playlist sonu, çalma duracak ve playlist modundan çıkılacak.');
-                  await pause();
-                  _audioProvider!.exitPlaylistMode();
-                  _audioProvider!.resetPlaybackState();
-                }
-              } else {
-                // Normal mod - tüm şarkı listesinden sonrakine geç
-                int nextIndex = currentIndex + 1;
-                if (nextIndex < _audioProvider!.audioFiles.length) {
-                  print('Sonraki şarkı başlatılıyor: $nextIndex');
-                  await _audioProvider!.playAtIndex(nextIndex, this);
-                } else {
-                  print('Son şarkıdayız, çalma duracak.');
-                  await pause();
-                  _audioProvider!.resetPlaybackState();
+                  // Playlist modunda mı kontrol et
+                  if (_audioProvider!.isPlayListRunning) {
+                    final nextPlaylistIndex = _audioProvider!.getNextSongIndexInPlaylist();
+                    if (nextPlaylistIndex != null) {
+                      DebugLogger.log('Playlist\'te sonraki şarkı başlatılıyor: $nextPlaylistIndex');
+                      await _audioProvider!.playPlaylistSongAtIndex(nextPlaylistIndex, this);
+                    } else {
+                      DebugLogger.log('Playlist sonu, çalma duracak ve playlist modundan çıkılacak.');
+                      await pause();
+                      _audioProvider!.exitPlaylistMode();
+                      _audioProvider!.resetPlaybackState();
+                    }
+                  } else {
+                    // Normal mod - tüm şarkı listesinden sonrakine geç
+                    int nextIndex = currentIndex + 1;
+                    if (nextIndex < _audioProvider!.audioFiles.length) {
+                      DebugLogger.log('Sonraki şarkı başlatılıyor: $nextIndex');
+                      await _audioProvider!.playAtIndex(nextIndex, this);
+                    } else {
+                      DebugLogger.log('Son şarkıdayız, çalma duracak.');
+                      await pause();
+                      _audioProvider!.resetPlaybackState();
+                    }
+                  }
                 }
               }
             }
+            _isAutoNexting = false;
           }
+        } catch (e) {
+          DebugLogger.log('❌ Player state stream hatası: $e');
+          _isAutoNexting = false;
         }
-        _isAutoNexting = false;
-      }
-    });
+      });
+    } catch (e) {
+      DebugLogger.log('❌ Player setup hatası: $e');
+    }
   }
 
   String _formatDuration(double milliseconds) {

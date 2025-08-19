@@ -32,33 +32,41 @@ class ThemeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final premiumProvider = Provider.of<PremiumProvider>(context);
-    final themeKeys = themeProvider.themes.keys.toList();
     final localeProvider = Provider.of<LocaleProvider>(context);
-
-    // Premium olmayan temaları filtrele
-    final freeThemeKeys = themeKeys.where((key) => !premiumProvider.isPremiumTheme(key)).toList();
+    
+    final currentLocale = localeProvider.locale?.languageCode ?? 'en';
+    final freeThemeKeys = themeProvider.themes.keys
+        .where((key) => !PremiumProvider.premiumThemeIds.contains(key))
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.themes),
+        backgroundColor: themeProvider.currentTheme.accentColor,
+        foregroundColor: themeProvider.currentTheme.textColor,
         actions: [
-          // Dil değiştirme butonu
+          // Restore purchases butonu
           IconButton(
-            icon: Icon(
-              (localeProvider.locale?.languageCode ?? 'tr') == 'tr' 
-                ? Icons.language 
-                : Icons.translate,
-            ),
-            onPressed: () {
-              final currentLang = localeProvider.locale?.languageCode ?? 'tr';
-              final newLocale = currentLang == 'tr' 
-                ? const Locale('en') 
-                : const Locale('tr');
-              localeProvider.setLocale(newLocale);
+            icon: Icon(Icons.restore),
+            onPressed: () async {
+              await premiumProvider.restorePurchases();
+              if (premiumProvider.errorMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(premiumProvider.errorMessage!),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(currentLocale == 'tr' ? 'Satın alınan temalar geri yüklendi' : 'Purchased themes restored'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
             },
-            tooltip: (localeProvider.locale?.languageCode ?? 'tr') == 'tr' 
-              ? 'Switch to English' 
-              : 'Türkçeye geç',
+            tooltip: currentLocale == 'tr' ? 'Satın alınanları geri yükle' : 'Restore purchases',
           ),
         ],
       ),

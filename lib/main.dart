@@ -1,21 +1,3 @@
-/*
- * N-Xade Music - A simple, elegant and open source music player
- * Copyright (C) 2024 N-Xade Studios
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -57,6 +39,10 @@ void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) async {
                purchaseDetails.status == PurchaseStatus.restored) {
       // Başarılı satın alma
       print('✅ Purchase successful: ${purchaseDetails.productID}');
+      
+      // Premium provider'a bildir
+      // Bu işlem MyApp widget'ında yapılacak
+      
       if (purchaseDetails.pendingCompletePurchase) {
         await InAppPurchase.instance.completePurchase(purchaseDetails);
       }
@@ -96,6 +82,30 @@ class MyApp extends StatelessWidget {
 
         return Consumer3<ThemeProvider, LocaleProvider, PremiumProvider>(
           builder: (context, themeProvider, localeProvider, premiumProvider, _) {
+            // İlk frame'den sonra izin isteğini tetikle
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              try {
+                Provider.of<AudioProvider>(context, listen: false).ensurePermissionRequested();
+              } catch (e) {
+                print('❌ İzin isteği hatası: $e');
+                // Hata durumunda uygulamayı durdurmak yerine sadece log yaz
+              }
+            });
+            
+            // Satın alma stream'ini premium provider'a bağla
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              try {
+                final purchaseStream = InAppPurchase.instance.purchaseStream;
+                purchaseStream.listen((purchaseDetailsList) {
+                  for (final purchaseDetails in purchaseDetailsList) {
+                    premiumProvider.handlePurchaseUpdate(purchaseDetails);
+                  }
+                });
+              } catch (e) {
+                print('❌ Satın alma stream hatası: $e');
+              }
+            });
+            
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'N-Xade Music',

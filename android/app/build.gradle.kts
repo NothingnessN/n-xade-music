@@ -17,8 +17,9 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.nxadestudios.nxademusic"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    compileSdk = 36  // Android 16 (API level 36)
+    // Use an NDK version compatible with current AGP/Flutter
+    ndkVersion = "25.2.9519653"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -31,10 +32,17 @@ android {
 
     defaultConfig {
         applicationId = "com.nxadestudios.nxademusic"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 26  // Android 8.1 (API level 26)
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    versionCode = 3
+    versionName = "1.12.2"
+
+        // Limit ABIs to production targets to avoid x86 cmake issues
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
     }
 
     signingConfigs {
@@ -49,10 +57,22 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("com.google.android.play:core:1.10.3")
+    implementation("com.google.android.play:core-ktx:1.8.1")
 }

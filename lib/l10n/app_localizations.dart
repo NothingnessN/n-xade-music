@@ -266,47 +266,29 @@ abstract class AppLocalizations {
   /// **'Themes'**
   String get themes;
 
-  /// No description provided for @premium_themes.
-  ///
-  /// In en, this message translates to:
-  /// **'Premium Themes'**
-  String get premium_themes;
-
   /// No description provided for @free_themes.
   ///
   /// In en, this message translates to:
-  /// **'Free Themes'**
+  /// **'Themes'**
   String get free_themes;
-
-  /// No description provided for @purchase_theme.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase Theme'**
-  String get purchase_theme;
-
-  /// No description provided for @theme_purchased.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme purchased!'**
-  String get theme_purchased;
-
-  /// No description provided for @purchase_failed.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase failed!'**
-  String get purchase_failed;
-
-  /// No description provided for @premium_theme_unlocked.
-  ///
-  /// In en, this message translates to:
-  /// **'Premium theme unlocked!'**
-  String get premium_theme_unlocked;
 
   /// No description provided for @playing_from.
   ///
   /// In en, this message translates to:
   /// **'Playing from:'**
   String get playing_from;
+
+  /// No description provided for @language_selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Selection'**
+  String get language_selection;
+
+  /// Message shown when a playlist has no songs
+  ///
+  /// In en, this message translates to:
+  /// **'No songs in this playlist'**
+  String get no_songs_in_playlist;
 }
 
 class _AppLocalizationsDelegate

@@ -25,8 +25,12 @@ class PlaylistInputModal extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.backgroundColor,
+          // Görsel temalara uyum: arka planı hafif şeffaflaştır ve kenar çizgisi ekle
+          color: (theme.backgroundImage != null)
+              ? Colors.black.withOpacity(0.85)
+              : theme.backgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border.all(color: theme.textColor.withOpacity(0.15)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -46,9 +50,13 @@ class PlaylistInputModal extends StatelessWidget {
               style: TextStyle(color: theme.textColor),
               decoration: InputDecoration(
                 hintText: localizations.playlist_title,
-                hintStyle: TextStyle(color: theme.textColor.withOpacity(0.5)),
+                hintStyle: TextStyle(color: theme.textColor.withOpacity(0.6)),
+                filled: true,
+                fillColor: (theme.backgroundImage != null)
+                    ? theme.textColor.withOpacity(0.08)
+                    : theme.textColor.withOpacity(0.06),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: theme.textColor.withOpacity(0.3)),
+                  borderSide: BorderSide(color: theme.textColor.withOpacity(0.25)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -68,7 +76,7 @@ class PlaylistInputModal extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   child: Text(
                     localizations.cancel,
-                    style: TextStyle(color: theme.textColor),
+                    style: TextStyle(color: theme.textColor.withOpacity(0.9)),
                   ),
                 ),
                 const SizedBox(width: 8),

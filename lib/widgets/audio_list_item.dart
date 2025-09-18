@@ -36,8 +36,10 @@ class AudioListItem extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   color: isActive 
-                    ? theme.accentColor.withOpacity(0.2)
-                    : theme.textColor.withOpacity(0.1),
+                    ? theme.accentColor.withOpacity(0.22)
+                    : (theme.backgroundImage != null
+                        ? theme.textColor.withOpacity(0.12)
+                        : theme.textColor.withOpacity(0.08)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -62,7 +64,7 @@ class AudioListItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${(audio.duration / 60).floor()}:${(audio.duration % 60).floor().toString().padLeft(2, '0')}',
+                      _formatDuration(audio.duration),
                       style: TextStyle(
                         color: theme.textColor.withOpacity(0.6),
                         fontSize: 13,
@@ -83,5 +85,13 @@ class AudioListItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDuration(double durationMs) {
+    // Duration milisaniye cinsinden geliyor, saniyeye çevir
+    final totalSeconds = (durationMs / 1000).round();
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes}:${seconds.toString().padLeft(2, '0')}';
   }
 }

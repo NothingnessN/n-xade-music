@@ -48,11 +48,11 @@
   "language_turkish": "Türkçe",
   "language_english": "İngilizce",
   "themes": "Temalar",
-  "premium_themes": "Premium Temalar",
-  "free_themes": "Ücretsiz Temalar",
-  "purchase_theme": "Tema Satın Al",
-  "theme_purchased": "Tema satın alındı!",
-  "purchase_failed": "Satın alma başarısız!",
-  "premium_theme_unlocked": "Premium tema açıldı!",
-  "playing_from": "Çalma listesinden:"
+  "free_themes": "Temalar",
+  "playing_from": "Çalma listesinden:",
+  "language_selection": "Dil Seçimi",
+  "no_songs_in_playlist": "Bu çalma listesinde şarkı yok",
+  "@no_songs_in_playlist": {
+  "description": "Çalma listesinde şarkı olmadığında gösterilen mesaj"
+}
 }

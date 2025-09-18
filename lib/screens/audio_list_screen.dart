@@ -6,6 +6,7 @@ import '../providers/theme_provider.dart';
 import '../widgets/screen.dart';
 import '../widgets/audio_list_item.dart';
 import 'package:nxade_music/l10n/app_localizations.dart';
+import 'theme_screen.dart';
 
 class AudioListScreen extends StatelessWidget {
   const AudioListScreen({Key? key}) : super(key: key);
@@ -36,7 +37,14 @@ class AudioListScreen extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.pushNamed(context, '/theme'),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const ThemeScreen(),
+                          );
+                        },
                         icon: Icon(
                           Icons.color_lens,
                           color: theme.accentColor,
@@ -56,13 +64,8 @@ class AudioListScreen extends StatelessWidget {
                       audio: audio,
                       onTap: () async {
                         audioProvider.resetPlaybackState();
-                        // Playlist modundan çık (normal mod)
                         audioProvider.exitPlaylistMode();
-                        audioProvider.updateState(
-                          currentAudioIndex: index,
-                          isPlaying: true,
-                        );
-                        await audioController.play(audio.uri);
+                        await audioProvider.playAtIndex(index, audioController);
                       },
                       onMoreTap: () => _showOptionsModal(audio, context),
                     );
@@ -82,11 +85,15 @@ class AudioListScreen extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.backgroundColor,
+          color: (theme.backgroundImage != null)
+              ? Colors.black.withOpacity(0.85)
+              : theme.backgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -116,11 +123,15 @@ class AudioListScreen extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.backgroundColor,
+          color: (theme.backgroundImage != null)
+              ? Colors.black.withOpacity(0.85)
+              : theme.backgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -136,23 +147,24 @@ class AudioListScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ...audioProvider.playlists.map((playlist) => ListTile(
-              title: Text(
-                playlist['title'],
-                style: TextStyle(color: theme.textColor),
-              ),
-              onTap: () {
-                audioProvider.addAudioToPlaylist(playlist['id'], audio);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      localizations.added_to_playlist(audio.filename, playlist['title'])
-                    ),
-                    backgroundColor: theme.accentColor,
+                  title: Text(
+                    playlist['title'],
+                    style: TextStyle(color: theme.textColor),
                   ),
-                );
-              },
-            )).toList(),
+                  onTap: () {
+                    audioProvider.addAudioToPlaylist(playlist['id'], audio);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          localizations.added_to_playlist(
+                              audio.filename, playlist['title']),
+                        ),
+                        backgroundColor: theme.accentColor,
+                      ),
+                    );
+                  },
+                )).toList(),
           ],
         ),
       ),

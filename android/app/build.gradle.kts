@@ -17,9 +17,9 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.nxadestudios.nxademusic"
-    compileSdk = 36  // Android 16 (API level 36)
+    compileSdk = 35  // Android 16 (API level 36)
     // Use an NDK version compatible with current AGP/Flutter
-    ndkVersion = "25.2.9519653"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -33,11 +33,9 @@ android {
     defaultConfig {
         applicationId = "com.nxadestudios.nxademusic"
         minSdk = 26  // Android 8.1 (API level 26)
-        targetSdk = 34
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    versionCode = 3
-    versionName = "1.12.2"
+        targetSdk = 35
+        versionCode = 5
+        versionName = "1.12.3"
 
         // Limit ABIs to production targets to avoid x86 cmake issues
         ndk {
@@ -70,9 +68,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    implementation("com.google.android.play:core:1.10.3")
-    implementation("com.google.android.play:core-ktx:1.8.1")
 }

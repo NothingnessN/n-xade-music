@@ -48,11 +48,11 @@
   "language_turkish": "Turkish",
   "language_english": "English",
   "themes": "Themes",
-  "premium_themes": "Premium Themes",
-  "free_themes": "Free Themes",
-  "purchase_theme": "Purchase Theme",
-  "theme_purchased": "Theme purchased!",
-  "purchase_failed": "Purchase failed!",
-  "premium_theme_unlocked": "Premium theme unlocked!",
-  "playing_from": "Playing from:"
+  "free_themes": "Themes",
+  "playing_from": "Playing from:",
+  "language_selection": "Language Selection",
+  "no_songs_in_playlist": "No songs in this playlist",
+  "@no_songs_in_playlist": {
+  "description": "Message shown when a playlist has no songs"
+}
 } 

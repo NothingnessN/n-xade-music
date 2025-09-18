@@ -51,98 +51,106 @@ class PlaylistScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: audioProvider.playlists.isEmpty
+                child: audioProvider.playlists == null
                     ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.queue_music,
-                              size: 64,
-                              color: theme.textColor.withOpacity(0.5),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              localizations.no_playlists,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: theme.textColor,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              localizations.click_to_create,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: theme.textColor.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
+                        child: CircularProgressIndicator(
+                          color: theme.accentColor,
                         ),
                       )
-                    : ListView.builder(
-                        itemCount: audioProvider.playlists.length,
-                        itemBuilder: (context, index) {
-                          final item = audioProvider.playlists[index];
-                          return Container(
-                            margin: EdgeInsets.only(bottom: 12),
-                            decoration: BoxDecoration(
-                              color: theme.backgroundColor,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
+                    : audioProvider.playlists!.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.queue_music,
+                                  size: 64,
+                                  color: theme.textColor.withOpacity(0.5),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  localizations.no_playlists,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.textColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  localizations.click_to_create,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: theme.textColor.withOpacity(0.7),
+                                  ),
                                 ),
                               ],
                             ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              leading: Container(
-                                width: 48,
-                                height: 48,
+                          )
+                        : ListView.builder(
+                            itemCount: audioProvider.playlists!.length,
+                            itemBuilder: (context, index) {
+                              final item = audioProvider.playlists![index];
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 12),
                                 decoration: BoxDecoration(
-                                  color: theme.accentColor.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: (theme.backgroundImage != null)
+                                      ? theme.textColor.withOpacity(0.06)
+                                      : theme.backgroundColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.12) ?? Colors.black12,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                                child: Icon(
-                                  Icons.queue_music,
-                                  color: theme.accentColor,
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  leading: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: theme.accentColor.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.queue_music,
+                                      color: theme.accentColor,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    item['title'],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.textColor,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    '${item['songs']?.length ?? 0} ${localizations.songs}',
+                                    style: TextStyle(
+                                      color: theme.textColor.withOpacity(0.7),
+                                    ),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: Icon(
+                                      Icons.more_vert,
+                                      color: theme.textColor,
+                                    ),
+                                    onPressed: () => _showPlaylistOptionsModal(context, item),
+                                  ),
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PlaylistDetailScreen(playList: item),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              title: Text(
-                                item['title'],
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.textColor,
-                                ),
-                              ),
-                              subtitle: Text(
-                                '${item['audios'].length} ${localizations.songs}',
-                                style: TextStyle(
-                                  color: theme.textColor.withOpacity(0.7),
-                                ),
-                              ),
-                              trailing: IconButton(
-                                icon: Icon(
-                                  Icons.more_vert,
-                                  color: theme.textColor,
-                                ),
-                                onPressed: () => _showPlaylistOptionsModal(context, item),
-                              ),
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PlaylistDetailScreen(playList: item),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            },
+                          ),
               ),
               const Spacer(),
               // Banner reklam
@@ -182,7 +190,13 @@ class PlaylistScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: theme.backgroundColor,
+        backgroundColor: (theme.backgroundImage != null)
+            ? Colors.black.withOpacity(0.85)
+            : theme.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: theme.textColor.withOpacity(0.15)),
+        ),
         title: Text(
           localizations.delete_playlist_title,
           style: TextStyle(color: theme.textColor),
@@ -214,7 +228,7 @@ class PlaylistScreen extends StatelessWidget {
             },
             child: Text(
               localizations.delete_playlist,
-              style: TextStyle(color: Colors.red),
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],

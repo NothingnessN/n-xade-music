@@ -49,14 +49,9 @@ The app uses the storage read permission solely for this purpose.
 
 No personal information (name, email, photos, etc.) is collected.
 
-3. Themes & Purchases
-The app includes color themes (solid and gradient) and custom image themes.
-Custom image themes are paid:
-
-10 TRY for users in Türkiye
-
-1 USD for global users
-Purchases are processed securely via Google Play’s billing system.
+3. Themes
+The app includes various color themes (solid and gradient) and custom image themes.
+All themes are completely free to use.
 
 4. Third-Party Services
 The app does not display ads and does not use any third-party analytics or tracking tools.

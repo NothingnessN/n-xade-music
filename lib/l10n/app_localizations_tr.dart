@@ -102,23 +102,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get themes => 'Temalar';
 
   @override
-  String get premium_themes => 'Premium Temalar';
-
-  @override
-  String get free_themes => 'Ücretsiz Temalar';
-
-  @override
-  String get purchase_theme => 'Tema Satın Al';
-
-  @override
-  String get theme_purchased => 'Tema satın alındı!';
-
-  @override
-  String get purchase_failed => 'Satın alma başarısız!';
-
-  @override
-  String get premium_theme_unlocked => 'Premium tema açıldı!';
+  String get free_themes => 'Temalar';
 
   @override
   String get playing_from => 'Çalma listesinden:';
+
+  @override
+  String get language_selection => 'Dil Seçimi';
+
+  @override
+  String get no_songs_in_playlist => 'Bu çalma listesinde şarkı yok';
 }

@@ -101,23 +101,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themes => 'Themes';
 
   @override
-  String get premium_themes => 'Premium Themes';
-
-  @override
-  String get free_themes => 'Free Themes';
-
-  @override
-  String get purchase_theme => 'Purchase Theme';
-
-  @override
-  String get theme_purchased => 'Theme purchased!';
-
-  @override
-  String get purchase_failed => 'Purchase failed!';
-
-  @override
-  String get premium_theme_unlocked => 'Premium theme unlocked!';
+  String get free_themes => 'Themes';
 
   @override
   String get playing_from => 'Playing from:';
+
+  @override
+  String get language_selection => 'Language Selection';
+
+  @override
+  String get no_songs_in_playlist => 'No songs in this playlist';
 }

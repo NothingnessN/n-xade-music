@@ -58,10 +58,19 @@ class PlaylistScreen extends StatelessWidget {
                         ),
                       )
                     : audioProvider.playlists!.isEmpty
+<<<<<<< HEAD
                         ? Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+=======
+                        ? SingleChildScrollView(
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+>>>>>>> 8f00aa7 (Added android 11-10 Mali Gpu Support)
                                 Icon(
                                   Icons.queue_music,
                                   size: 64,
@@ -86,7 +95,12 @@ class PlaylistScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
+<<<<<<< HEAD
                           )
+=======
+                          ),
+                        )
+>>>>>>> 8f00aa7 (Added android 11-10 Mali Gpu Support)
                         : ListView.builder(
                             itemCount: audioProvider.playlists!.length,
                             itemBuilder: (context, index) {

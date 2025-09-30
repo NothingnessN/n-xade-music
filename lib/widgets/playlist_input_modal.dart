@@ -90,8 +90,8 @@ class PlaylistInputModal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    'Create',
+                  child: Text(
+                    localizations.create,
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

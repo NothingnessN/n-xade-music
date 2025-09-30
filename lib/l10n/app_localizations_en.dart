@@ -77,6 +77,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String get create => 'Create';
+
+  @override
   String removed_from_playlist(Object songName) {
     return '$songName removed from playlist';
   }

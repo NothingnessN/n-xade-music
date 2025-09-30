@@ -78,6 +78,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cancel => 'İptal';
 
   @override
+  String get create => 'Oluştur';
+
+  @override
   String removed_from_playlist(Object songName) {
     return '$songName çalma listesinden kaldırıldı';
   }

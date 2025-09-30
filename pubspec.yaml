@@ -20,18 +20,21 @@ dependencies:
   material_design_icons_flutter: ^7.0.7296
   flutter_gradient_colors: ^2.0.0
   cached_network_image: ^3.3.1
-  audiotags: ^1.4.5
+  on_audio_query: ^2.9.0
   just_audio_background: ^0.0.1-beta.17
   flutter_phoenix: ^1.1.1
   get: ^4.6.6
   google_fonts: ^6.1.0
-  on_audio_query: ^2.9.0
   permission_handler: ^11.3.1
   google_mobile_ads: ^4.0.0
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
   intl_translation: ^0.20.1
+<<<<<<< HEAD
+=======
+  device_info_plus: ^10.1.2
+>>>>>>> 8f00aa7 (Added android 11-10 Mali Gpu Support)
 
 dev_dependencies:
   flutter_test:

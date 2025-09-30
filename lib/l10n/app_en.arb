@@ -26,6 +26,7 @@
     }
   },
   "cancel": "Cancel",
+  "create": "Create",
   "removed_from_playlist": "{songName} removed from playlist",
   "@removed_from_playlist": {
     "placeholders": {

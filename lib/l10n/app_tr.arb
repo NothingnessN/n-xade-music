@@ -26,6 +26,7 @@
     }
   },
   "cancel": "İptal",
+  "create": "Oluştur",
   "removed_from_playlist": "{songName} çalma listesinden kaldırıldı",
   "@removed_from_playlist": {
     "placeholders": {

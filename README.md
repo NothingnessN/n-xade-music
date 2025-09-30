@@ -11,7 +11,7 @@
 
 </div>
 
-AKN Music Player is an open-source music player application with a modern and user-friendly interface. It has been developed with a focus on privacy, without ads, and completely free.
+NXade Music Player is an open-source music player application with a modern and user-friendly interface. It has been developed with a focus on privacy, without ads, and completely free.
 
 ## ✨ Features
 
@@ -46,7 +46,7 @@ AKN Music Player is an open-source music player application with a modern and us
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/akn_music_flutter_new.git
+git clone https://github.com/yourusername/n-xade-music.git
 ```
 
 2. Install dependencies:
@@ -76,9 +76,8 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 ## 📞 Contact
 
 - GitHub: [@NothingnessN](https://github.com/NothingnessN)
-- Instagram: [@nothingnessnxd4rk](https://www.instagram.com/nothingnessnxd4rk/)
-- Instagram 2: [@akn_d3s1gn](https://www.instagram.com/akn_d3s1gn)
-- Email: d4rkxnothing@gmail.com
+- Instagram: [@n_xade_studios](https://www.instagram.com/n_xade_studios/)
+- Email: nxadestudios@gmail.com
 
 ## 🙏 Acknowledgments
 

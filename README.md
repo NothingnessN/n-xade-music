@@ -7,8 +7,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://www.android.com)
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev)
-[![F-Droid](https://img.shields.io/f-droid/v/com.nothingnessn.aknmusic.svg)](https://f-droid.org/packages/com.nothingnessn.aknmusic/)
-
 </div>
 
 NXade Music Player is an open-source music player application with a modern and user-friendly interface. It has been developed with a focus on privacy, without ads, and completely free.
